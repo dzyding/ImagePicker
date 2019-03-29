@@ -10,7 +10,7 @@ import UIKit
 import Photos
 import SnapKit
 
-class DzyImagePickerVC: UIViewController {
+public class DzyImagePickerVC: UIViewController {
     /// 高 / 宽
     var cropScale: CGFloat = 1
     
@@ -22,7 +22,7 @@ class DzyImagePickerVC: UIViewController {
     
     private weak var collectionView: UICollectionView?
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.isTranslucent = true
         navigationController?.navigationBar.alpha = 0.7
@@ -41,17 +41,17 @@ class DzyImagePickerVC: UIViewController {
     }
     
     //    MARK: - 取消
-    @objc func cancelAction() {
+    @objc private func cancelAction() {
         dismiss(animated: true, completion: nil)
     }
     
     //    MARK: - 返回
-    @objc func backAction() {
+    @objc private func backAction() {
         navigationController?.popViewController(animated: true)
     }
     
     // MARK: - 判断权限
-    func checkAuthorization() {
+    private func checkAuthorization() {
         let status = PHPhotoLibrary.authorizationStatus()
         switch status {
         case .denied:
@@ -79,7 +79,7 @@ class DzyImagePickerVC: UIViewController {
     }
     
     //    MARK: - 获取所有相册
-    func getPhotoAlbums() {
+    private func getPhotoAlbums() {
         //创建一个PHFetchOptions对象检索照片
         let options = PHFetchOptions()
         //通过创建时间来检索
@@ -91,7 +91,7 @@ class DzyImagePickerVC: UIViewController {
         self.collectionView?.reloadData()
     }
     
-    func setNaviItem() {
+    private func setNaviItem() {
         navigationItem.hidesBackButton = true
         
         let right = UIButton(type: .custom)
@@ -111,7 +111,7 @@ class DzyImagePickerVC: UIViewController {
         navigationItem.leftBarButtonItem = leftBtn
     }
     
-    func setViewControllers() {
+    private func setViewControllers() {
         if navigationController?.viewControllers.count == 1 {
             let vc = DzyAlbumsVC()
             vc.cropScale = cropScale
@@ -122,7 +122,7 @@ class DzyImagePickerVC: UIViewController {
         }
     }
     
-    func setCollectionView() {
+    private func setCollectionView() {
         let screenW = UIScreen.main.bounds.size.width
         let x = (screenW - 6.0) / 4.0
         let layout = UICollectionViewFlowLayout()
@@ -155,17 +155,17 @@ class DzyImagePickerVC: UIViewController {
 
 extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource {
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return photos?.count ?? 0
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImagePickCell", for: indexPath) as? ImagePickCell
         cell?.updateViews(photos?.object(at: indexPath.row))
         return cell!
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    private func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let photo = photos?.object(at: indexPath.row) {
             var type: CropType = .square
             if cropScale != 1 {
