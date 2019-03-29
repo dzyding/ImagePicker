@@ -12,9 +12,9 @@ import SnapKit
 
 public class DzyImagePickerVC: UIViewController {
     /// 高 / 宽
-    var cropScale: CGFloat = 1
+    public var cropScale: CGFloat = 1
     
-    var handler: ((UIImage?) -> ())?
+    public var handler: ((UIImage?) -> ())?
     
     var album: String?
  
