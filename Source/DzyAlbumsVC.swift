@@ -10,7 +10,7 @@ import UIKit
 import Photos
 import SnapKit
 
-class DzyAlbumsVC: UIViewController {
+public class DzyAlbumsVC: UIViewController {
     /// 高 / 宽
     var cropScale: CGFloat = 1
     
@@ -21,7 +21,7 @@ class DzyAlbumsVC: UIViewController {
     
     private weak var tableView: UITableView?
 
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "全部相册"
         basicStep()
@@ -29,7 +29,7 @@ class DzyAlbumsVC: UIViewController {
     }
     
     // 获取所有相册 
-    func loadAlbums() {
+    private func loadAlbums() {
         //创建一个PHFetchOptions对象检索照片
         let options = PHFetchOptions()
         //通过创建时间来检索
@@ -64,7 +64,7 @@ class DzyAlbumsVC: UIViewController {
         tableView?.reloadData()
     }
     
-    func basicStep() {
+    private func basicStep() {
         let tableView = UITableView(frame: view.bounds, style: .plain)
         tableView.separatorStyle = .none
         tableView.delegate = self
@@ -90,11 +90,11 @@ class DzyAlbumsVC: UIViewController {
 
 extension DzyAlbumsVC: UITableViewDelegate, UITableViewDataSource {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return albums.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let album = albums[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! AlbumsCell
         cell.nameLB?.text = album.keys.first
@@ -106,7 +106,7 @@ extension DzyAlbumsVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let album = albums[indexPath.row]
         let vc = DzyImagePickerVC()
         vc.album = album.keys.first

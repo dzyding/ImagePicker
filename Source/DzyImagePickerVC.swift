@@ -16,9 +16,9 @@ public class DzyImagePickerVC: UIViewController {
     
     public var handler: ((UIImage?) -> ())?
     
-    var album: String?
+    public var album: String?
  
-    var photos: PHFetchResult<PHAsset>?
+    public var photos: PHFetchResult<PHAsset>?
     
     private weak var collectionView: UICollectionView?
     
@@ -157,17 +157,17 @@ public class DzyImagePickerVC: UIViewController {
 
 extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource {
     
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return photos?.count ?? 0
     }
     
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImagePickCell", for: indexPath) as? ImagePickCell
         cell?.updateViews(photos?.object(at: indexPath.row))
         return cell!
     }
     
-    private func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let photo = photos?.object(at: indexPath.row) {
             var type: CropType = .square
             if cropScale != 1 {

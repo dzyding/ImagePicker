@@ -10,7 +10,7 @@ import UIKit
 import Photos
 import SnapKit
 
-enum CornerTag: Int {
+public enum CornerTag: Int {
     ///左上
     case LT = 1
     /// 左下
@@ -21,7 +21,7 @@ enum CornerTag: Int {
     case RB
 }
 
-enum CropType {
+public enum CropType {
     case square
     case rectangle(CGFloat) // 高 : 宽
 }
@@ -56,7 +56,7 @@ public class DzyImageBrowserVC: UIViewController {
         return true
     }
     // 中间占位图的 frame
-    lazy var rectF: CGRect = {
+    private lazy var rectF: CGRect = {
         let x: CGFloat = 20.0
         let width = sW - 40.0
         switch type {
@@ -70,7 +70,7 @@ public class DzyImageBrowserVC: UIViewController {
         }
     }()
     
-    weak var pickerVC: DzyImagePickerVC?
+    public weak var pickerVC: DzyImagePickerVC?
     
     init(_ photo: PHAsset, type: CropType = .square) {
         self.photo = photo
@@ -98,7 +98,7 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     //    MARK: - 读取照片
-    func loadImage() {
+    private func loadImage() {
         let manager = PHImageManager.default()
         let size = CGSize(width: photo.pixelWidth, height: photo.pixelHeight)
         let option = PHImageRequestOptions()
@@ -111,7 +111,7 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     //    MARK: - 设置初始的状态
-    func updateViews(_ image: UIImage?) {
+    private func updateViews(_ image: UIImage?) {
         guard let image = image else {return}
         imgView?.image = image
         let imageWHRatio = image.size.width / image.size.height
@@ -135,7 +135,7 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     // 设置缩放比例
-    func setScale(_ image: UIImage) {
+    private func setScale(_ image: UIImage) {
         guard let imgView = imgView else {return}
         let imageWHRatio = image.size.width / image.size.height
         // 计算最小缩放比例
@@ -156,7 +156,7 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     //    MARK: - 移动操作
-    @objc func panAction(_ pan: UIPanGestureRecognizer) {
+    @objc private func panAction(_ pan: UIPanGestureRecognizer) {
         switch pan.state {
         case .began:
             hideBlackCover()
@@ -177,7 +177,7 @@ public class DzyImageBrowserVC: UIViewController {
     
     //    MARK: - lastPoints
     // pan 结束以后刷新所有的 lastPoint
-    func updateLastPoints(_ pan: UIPanGestureRecognizer) {
+    private func updateLastPoints(_ pan: UIPanGestureRecognizer) {
         if pan.view == corners[0] {
             let old = lastPoints[0]
             let new = pan.translation(in: pan.view)
@@ -234,7 +234,7 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     // pan 开始时
-    func checkLastPoint(_ pan: UIPanGestureRecognizer) {
+    private func checkLastPoint(_ pan: UIPanGestureRecognizer) {
         var point = CGPoint.zero
         corners.enumerated().forEach { (index, v) in
             if v == pan.view {
@@ -245,12 +245,12 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     // 清除
-    func clearLastPoint() {
+    private func clearLastPoint() {
         lastPoints = [CGPoint](repeatElement(.zero, count: 4))
     }
     
     //    MARK: - 隐藏和显示黑色遮罩
-    func showBlackCover() {
+    private func showBlackCover() {
         (901...904).forEach { (tag) in
             if let v = view.viewWithTag(tag) {
                 v.isHidden = false
@@ -259,7 +259,7 @@ public class DzyImageBrowserVC: UIViewController {
         sureBtn?.isHidden = false
     }
     
-    func hideBlackCover() {
+    private func hideBlackCover() {
         (901...904).forEach { (tag) in
             if let v = view.viewWithTag(tag) {
                 v.isHidden = true
@@ -269,7 +269,7 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     //    MARK: - safeX
-    func safeX(_ old: CGPoint, new: CGPoint, corner: CornerTag) -> CGFloat {
+    private func safeX(_ old: CGPoint, new: CGPoint, corner: CornerTag) -> CGFloat {
         guard let tempView = tempView else {return new.x - old.x}
         switch corner {
         case .LT:
@@ -324,7 +324,7 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     //    MARK: - 接着 pan 手势之后做滑动或放大时
-    func panNextAction() {
+    private func panNextAction() {
         if let last = lastMoveTime,
             Date().timeIntervalSince1970 - last <= 2 // 两秒内接着 pan 的手势滑动 scrollView
         {
@@ -338,7 +338,7 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     //    MARK: - 拖动时的处理
-    func panUpdateViews(_ pan: UIPanGestureRecognizer) {
+    private func panUpdateViews(_ pan: UIPanGestureRecognizer) {
         if let v = pan.view,
             let tempView = tempView
         {
@@ -506,7 +506,7 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     //    MARK: - 拖动完成以后还原
-    func panEndAction() {
+    private func panEndAction() {
         guard let lastMoveTime = lastMoveTime,
             Date().timeIntervalSince1970 - lastMoveTime >= 2,
             let tempView = tempView else {return}
@@ -535,7 +535,7 @@ public class DzyImageBrowserVC: UIViewController {
     }
     
     //    MARK: - 放大到指定的区域
-    func zoomToSelectRect() {
+    private func zoomToSelectRect() {
         let ltFrame = corners[0].frame
         let rbFrame = corners[3].frame
         let ltpoint = view.convert(CGPoint(x: ltFrame.origin.x + 3, y: ltFrame.origin.y + 3), to: imgView)
@@ -548,15 +548,15 @@ public class DzyImageBrowserVC: UIViewController {
     
     
     //    MARK: - 取消 、还原 和 完成
-    @objc func cancelAction() {
+    @objc private func cancelAction() {
         navigationController?.popViewController(animated: true)
     }
     
-    @objc func restoreAction() {
+    @objc private func restoreAction() {
         scrollView?.setZoomScale(1, animated: true)
     }
     
-    @objc func sureAction() {
+    @objc private func sureAction() {
         guard let imgView = imgView,
             let img = imgView.image,
             let scrollView = scrollView
@@ -587,24 +587,9 @@ public class DzyImageBrowserVC: UIViewController {
             dismiss(animated: true, completion: nil)
         }
     }
-}
-
-extension DzyImageBrowserVC: UIScrollViewDelegate {
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        panNextAction()
-    }
-    
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return imgView
-    }
-    
-    func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        panNextAction()
-        zoomingFunction()
-    }
-    
-    func zoomingFunction() {
+    //    MARK: - 缩放时的方法
+    private func zoomingFunction() {
         guard let scrollView = scrollView else {return}
         //等比例放大图片以后，让放大后的ImageView保持在ScrollView的中央
         let offsetX = scrollView.bounds.size.width > scrollView.contentSize.width ?
@@ -646,11 +631,9 @@ extension DzyImageBrowserVC: UIScrollViewDelegate {
         
         scrollView.contentInset = UIEdgeInsets(top: topBottomInset, left: leftRightInset, bottom: topBottomInset, right: leftRightInset)
     }
-}
-
-//MARK: -  UI
-extension DzyImageBrowserVC {
-    func basicStep() {
+    
+    //    MARK: UI ------------------------------------------
+    private func basicStep() {
         let frame = UIScreen.main.bounds
         let scrollView = UIScrollView(frame: frame)
         scrollView.delegate = self
@@ -730,7 +713,7 @@ extension DzyImageBrowserVC {
     }
     
     //    MARK: - 黑色遮罩
-    func setBlackCoverView() {
+    private func setBlackCoverView() {
         guard let tempView = tempView else {return}
         let color = UIColor(red: 51.0 / 255.0, green: 51.0 / 255.0, blue: 51.0 / 255.0, alpha: 0.8)
         
@@ -774,7 +757,7 @@ extension DzyImageBrowserVC {
     }
     
     //    MARK: - 设置可移动视图
-    func setMoveView() {
+    private func setMoveView() {
         guard let tempView = tempView else {return}
         func getView(_ tag: Int) -> (UIView, UIView, UIView, UIPanGestureRecognizer) {
             let v = UIView()
@@ -891,7 +874,7 @@ extension DzyImageBrowserVC {
         topShadow.layer.shadowColor = UIColor(red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1).cgColor
         topShadow.layer.shadowOpacity = 0.7
         topLine.addSubview(topShadow)
-
+        
         topLine.snp.makeConstraints { (make) in
             make.top.equalTo(lt.0)
             make.left.equalTo(lt.0).offset(3)
@@ -917,7 +900,7 @@ extension DzyImageBrowserVC {
         bottomShadow.layer.shadowColor = UIColor(red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1).cgColor
         bottomShadow.layer.shadowOpacity = 0.7
         bottomLine.addSubview(bottomShadow)
-
+        
         bottomLine.snp.makeConstraints { (make) in
             make.bottom.equalTo(lb.0)
             make.left.right.equalTo(topLine)
@@ -955,7 +938,7 @@ extension DzyImageBrowserVC {
             make.width.equalTo(1)
             make.right.equalTo(-1)
         }
-
+        
         let rightLine = UIView()
         rightLine.backgroundColor = .clear
         rightLine.isUserInteractionEnabled = false
@@ -968,7 +951,7 @@ extension DzyImageBrowserVC {
         rightShadow.layer.shadowColor = UIColor(red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1).cgColor
         rightShadow.layer.shadowOpacity = 0.7
         rightLine.addSubview(rightShadow)
-
+        
         rightLine.snp.makeConstraints { (make) in
             make.top.equalTo(rt.0).offset(3)
             make.bottom.equalTo(rb.0).offset(-3)
@@ -1009,5 +992,21 @@ extension DzyImageBrowserVC {
             make.height.equalTo(leftLine).multipliedBy(0.33)
             make.centerY.equalTo(leftLine)
         }
+    }
+}
+
+extension DzyImageBrowserVC: UIScrollViewDelegate {
+    
+    open func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        panNextAction()
+    }
+    
+    open func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return imgView
+    }
+    
+    open func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        panNextAction()
+        zoomingFunction()
     }
 }

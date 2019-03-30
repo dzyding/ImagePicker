@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
  s.name         = 'DzyImagePicker'
 
- s.version      = '1.0.4'
+ s.version      = '1.0.5'
 
  s.summary      = 'image picker'
 
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 
  s.platform     = :ios, '9.0'
 
- s.source        = { :git => 'https://github.com/dzyding/ImagePicker.git', :tag => '1.0.4' }
+ s.source        = { :git => 'https://github.com/dzyding/ImagePicker.git', :tag => '1.0.5' }
 
  s.source_files  = 'Source/*.swift'
 
