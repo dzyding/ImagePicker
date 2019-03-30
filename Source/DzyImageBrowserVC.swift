@@ -26,7 +26,7 @@ enum CropType {
     case rectangle(CGFloat) // 高 : 宽
 }
 
-class DzyImageBrowserVC: UIViewController {
+public class DzyImageBrowserVC: UIViewController {
     
     private var sW = UIScreen.main.bounds.size.width
     
@@ -52,7 +52,7 @@ class DzyImageBrowserVC: UIViewController {
     // 四个最终值
     private var lastPoints = [CGPoint](repeatElement(.zero, count: 4))
     // 隐藏状态栏
-    override var prefersStatusBarHidden: Bool {
+    override public var prefersStatusBarHidden: Bool {
         return true
     }
     // 中间占位图的 frame
@@ -82,7 +82,7 @@ class DzyImageBrowserVC: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.setNavigationBarHidden(true, animated: false)
         setNeedsStatusBarAppearanceUpdate()
@@ -92,7 +92,7 @@ class DzyImageBrowserVC: UIViewController {
         loadImage()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    override public func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
     }

@@ -103,8 +103,10 @@ public class DzyImagePickerVC: UIViewController {
         let rightBtn = UIBarButtonItem(customView: right)
         navigationItem.rightBarButtonItem = rightBtn
         
+        let bundle = Bundle(url: Bundle(for: DzyImagePickerVC.self).url(forResource: "DzyImagePicker", withExtension: "bundle")!)
+        let image = UIImage(contentsOfFile: bundle?.path(forResource: "dzy_back", ofType: "png") ?? "")
         let left = UIButton(type: .custom)
-        left.setImage(UIImage(named: "dzy_back"), for: .normal)
+        left.setImage(image, for: .normal)
         left.addTarget(self, action: #selector(backAction), for: .touchUpInside)
         left.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
         let leftBtn = UIBarButtonItem(customView: left)
