@@ -22,7 +22,7 @@ present(navi, animated: true, completion: nil)
 
 长方形:  
 
-```
+```swift
 let vc = DzyImagePickerVC()
 // 0.66 = 宽 / 高
 vc.cropScale = 0.66
