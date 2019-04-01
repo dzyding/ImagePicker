@@ -10,11 +10,40 @@ import UIKit
 import Photos
 import SnapKit
 
+@objc public protocol DzyImagePickerVCDelegate {
+    /// 裁剪过的
+    func imagePicker(_ picker: DzyImagePickerVC?, getCropImage image: UIImage)
+    /// 原始图片
+    func imagePicker(_ picker: DzyImagePickerVC?, getOriginImage image: UIImage)
+}
+
 public class DzyImagePickerVC: UIViewController {
-    /// 高 / 宽
-    public var cropScale: CGFloat = 1
+    /// 代理
+    public weak var delegate: DzyImagePickerVCDelegate? {
+        set {
+            PickerManager.default.delegate = newValue
+        }get {
+            return PickerManager.default.delegate
+        }
+    }
     
-    public var handler: ((UIImage?) -> ())?
+    /// 高 / 宽
+    public var cropScale: CGFloat {
+        set {
+            PickerManager.default.cropScale = newValue
+        }get {
+            return PickerManager.default.cropScale
+        }
+    }
+    
+    /// 是否裁剪
+    public var ifCrop: Bool {
+        set {
+            PickerManager.default.ifCrop = newValue
+        }get {
+            return PickerManager.default.ifCrop
+        }
+    }
     
     public var album: String?
  
@@ -116,8 +145,6 @@ public class DzyImagePickerVC: UIViewController {
     private func setViewControllers() {
         if navigationController?.viewControllers.count == 1 {
             let vc = DzyAlbumsVC()
-            vc.cropScale = cropScale
-            vc.handler = handler
             var vcs = navigationController?.viewControllers
             vcs?.insert(vc, at: 0)
             navigationController?.setViewControllers(vcs!, animated: true)
@@ -153,6 +180,12 @@ public class DzyImagePickerVC: UIViewController {
             make.left.right.equalTo(0)
         }
     }
+    
+    deinit {
+        // 默认需要裁剪，正方形
+        PickerManager.default.ifCrop = true
+        PickerManager.default.cropScale = 1
+    }
 }
 
 extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -168,14 +201,29 @@ extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource
     }
     
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let photo = photos?.object(at: indexPath.row) {
+        guard let photo = photos?.object(at: indexPath.row) else {
+            return
+        }
+        if ifCrop {
             var type: CropType = .square
             if cropScale != 1 {
                 type = .rectangle(cropScale)
             }
             let vc = DzyImageBrowserVC(photo, type: type)
-            vc.pickerVC = self
             navigationController?.pushViewController(vc, animated: true)
+        }else {
+            let option = PHImageRequestOptions()
+            option.resizeMode = .exact
+            option.deliveryMode = .highQualityFormat
+            option.isSynchronous = true
+            
+            let manager = PHImageManager.default()
+            manager.requestImage(for: photo, targetSize: CGSize(width: photo.pixelWidth, height: photo.pixelHeight), contentMode: .aspectFit, options: option) { (image, info) in
+                if let image = image {
+                    self.dismiss(animated: true, completion: nil)
+                    PickerManager.default.delegate?.imagePicker(self, getOriginImage: image)
+                }
+            }
         }
     }
 }

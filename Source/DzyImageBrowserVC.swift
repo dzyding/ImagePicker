@@ -70,8 +70,6 @@ public class DzyImageBrowserVC: UIViewController {
         }
     }()
     
-    public weak var pickerVC: DzyImagePickerVC?
-    
     init(_ photo: PHAsset, type: CropType = .square) {
         self.photo = photo
         self.type = type
@@ -583,7 +581,7 @@ public class DzyImageBrowserVC: UIViewController {
             let final = ref.cropping(to: rect)
         {
             let new = UIImage(cgImage: final, scale: 1, orientation: .up)
-            pickerVC?.handler?(new)
+            PickerManager.default.delegate?.imagePicker(nil, getCropImage: new)
             dismiss(animated: true, completion: nil)
         }
     }

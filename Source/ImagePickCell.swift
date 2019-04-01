@@ -37,7 +37,7 @@ class ImagePickCell: UICollectionViewCell {
     func updateViews(_ photo: PHAsset?) {
         let option = PHImageRequestOptions()
         option.resizeMode = .exact
-        option.deliveryMode = .opportunistic
+        option.deliveryMode = .highQualityFormat
         option.isSynchronous = false
         
         if let photo = photo {

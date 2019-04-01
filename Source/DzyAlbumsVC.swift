@@ -11,11 +11,6 @@ import Photos
 import SnapKit
 
 public class DzyAlbumsVC: UIViewController {
-    /// 高 / 宽
-    var cropScale: CGFloat = 1
-    
-    var handler: ((UIImage?) -> ())?
-    
     // 所有相册
     private var albums = [[String: PHFetchResult<PHAsset>]]()
     
@@ -111,8 +106,6 @@ extension DzyAlbumsVC: UITableViewDelegate, UITableViewDataSource {
         let vc = DzyImagePickerVC()
         vc.album = album.keys.first
         vc.photos = album.values.first
-        vc.cropScale = cropScale
-        vc.handler = handler
         navigationController?.pushViewController(vc, animated: true)
     }
 }
