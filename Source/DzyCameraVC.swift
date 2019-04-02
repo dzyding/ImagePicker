@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 import AVFoundation
 
 class DzyCameraVC: UIViewController {
@@ -27,14 +28,18 @@ class DzyCameraVC: UIViewController {
         return s
     }()
     
-    var device = AVCaptureDevice.default(for: .video)
-
+    private var device = AVCaptureDevice.default(for: .video)
+    
+    private weak var output: AVCaptureOutput?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        basicStep()
+        setUI()
+        setCamera()
     }
     
-    func basicStep() {
+    //    MARK: - 拍照的设置
+    func setCamera() {
         if let device = device {
             do {
                 let layer = AVCaptureVideoPreviewLayer(session: session)
@@ -49,40 +54,19 @@ class DzyCameraVC: UIViewController {
                     session.addInput(deviceInput)
                 }
                 
-                var dic: [String : Any] = [:]
-                if #available(iOS 11.0, *) {
-                    //AVVideoCompressionPropertiesKey 设置压缩属性的
-                    dic = [AVVideoCodecKey : AVVideoCodecType.jpeg]
-                } else {
-                    dic = [AVVideoCodecKey : AVVideoCodecJPEG]
-                }
+                
                 if #available(iOS 10.0, *) {
                     let output = AVCapturePhotoOutput()
-                    
                     if session.canAddOutput(output) {
                         session.addOutput(output)
-                        // 支持的
-                        let avai = output.availablePhotoCodecTypes
-                        print(avai)
-                        let settings = AVCapturePhotoSettings(format: dic)
-                        output.capturePhoto(with: settings, delegate: self)
+                        self.output = output
                     }
                 }else {
                     let output = AVCaptureStillImageOutput()
                     output.outputSettings = [AVVideoCodecKey : AVVideoCodecJPEG]
                     if session.canAddOutput(output) {
                         session.addOutput(output)
-                        
-                        guard let connection = output.connection(with: .video) else {return}
-                        connection.videoOrientation = .portrait
-                        output.captureStillImageAsynchronously(from: connection) { (buffer, error) in
-                            if let buffer = buffer,
-                                let jpegData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer),
-                                let image = UIImage(data: jpegData)
-                            {
-                                UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
-                            }
-                        }
+                        self.output = output
                     }
                 }
                 session.startRunning()
@@ -91,11 +75,56 @@ class DzyCameraVC: UIViewController {
             }
         }
     }
+    
+    //    MARK: - 拍照
+    @objc func takePhoto() {
+        if #available(iOS 10.0, *) {
+            if let output = output as? AVCapturePhotoOutput {
+                let settings: AVCapturePhotoSettings = {
+                    var dic: [String : Any] = [:]
+                    if #available(iOS 11.0, *) {
+                        dic = [AVVideoCodecKey : AVVideoCodecType.jpeg]
+                    } else {
+                        dic = [AVVideoCodecKey : AVVideoCodecJPEG]
+                    }
+                    return AVCapturePhotoSettings(format: dic)
+                }()
+                output.capturePhoto(with: settings, delegate: self)
+            }
+        }else {
+            if let output = output as? AVCaptureStillImageOutput,
+                let connection = output.connection(with: .video)
+            {
+                connection.videoOrientation = .portrait
+                output.captureStillImageAsynchronously(from: connection) { (buffer, error) in
+                    if let buffer = buffer,
+                        let jpegData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer),
+                        let image = UIImage(data: jpegData)
+                    {
+                        UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
+                    }
+                }
+            }
+        }
+    }
+    
+    //    MARK: - 界面设置
+    private func setUI() {
+        let btn = TakePhotoBtn(type: .custom)
+        btn.addTarget(self, action: #selector(takePhoto), for: .touchUpInside)
+        view.addSubview(btn)
+        
+        btn.snp.makeConstraints { (make) in
+            make.width.height.equalTo(100)
+            make.centerX.equalTo(view)
+            make.bottom.equalTo(-50)
+        }
+    }
 }
 
 extension DzyCameraVC: AVCapturePhotoCaptureDelegate {
 
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+    open func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let data = photo.fileDataRepresentation(),
             let image = UIImage(data: data)
         {
@@ -103,7 +132,7 @@ extension DzyCameraVC: AVCapturePhotoCaptureDelegate {
         }
     }
     
-    @objc func image(_ image: UIImage, didFinishSavingWithError error: Error, contextInfo: UnsafeRawPointer) {
+    @objc open func image(_ image: UIImage, didFinishSavingWithError error: Error, contextInfo: UnsafeRawPointer) {
         print("成功")
     }
 }

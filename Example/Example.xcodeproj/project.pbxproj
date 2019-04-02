@@ -20,6 +20,7 @@
 		00594B4122533E0C006CA687 /* AlbumsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00594B3822533E0B006CA687 /* AlbumsCell.swift */; };
 		00594B4222533E0C006CA687 /* DzyImagePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00594B3922533E0B006CA687 /* DzyImagePickerVC.swift */; };
 		00594B4322533E0C006CA687 /* DzyImagePicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 00594B3B22533E0C006CA687 /* DzyImagePicker.bundle */; };
+		00594B4522536378006CA687 /* TakePhotoBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00594B4422536378006CA687 /* TakePhotoBtn.swift */; };
 		8E9EA93292D1A42CBE52CD17 /* Pods_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2937F5BB67B2F35D2D4BA72A /* Pods_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -39,6 +40,7 @@
 		00594B3822533E0B006CA687 /* AlbumsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumsCell.swift; sourceTree = "<group>"; };
 		00594B3922533E0B006CA687 /* DzyImagePickerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DzyImagePickerVC.swift; sourceTree = "<group>"; };
 		00594B3B22533E0C006CA687 /* DzyImagePicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DzyImagePicker.bundle; sourceTree = "<group>"; };
+		00594B4422536378006CA687 /* TakePhotoBtn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TakePhotoBtn.swift; sourceTree = "<group>"; };
 		11232D161F68188D67BE3DE2 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		2937F5BB67B2F35D2D4BA72A /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6C3FE6ADC9E41ECC951E35E /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 				00594B3722533E0B006CA687 /* DzyAlbumsVC.swift */,
 				00594B3822533E0B006CA687 /* AlbumsCell.swift */,
 				00594B3922533E0B006CA687 /* DzyImagePickerVC.swift */,
+				00594B4422536378006CA687 /* TakePhotoBtn.swift */,
 			);
 			name = Source;
 			path = ../../Source;
@@ -257,6 +260,7 @@
 				00594B3D22533E0C006CA687 /* DzyCameraVC.swift in Sources */,
 				00594AC722533B45006CA687 /* AppDelegate.swift in Sources */,
 				00594B4022533E0C006CA687 /* DzyAlbumsVC.swift in Sources */,
+				00594B4522536378006CA687 /* TakePhotoBtn.swift in Sources */,
 				00594B3C22533E0C006CA687 /* PickerManager.swift in Sources */,
 				00594B3F22533E0C006CA687 /* DzyImageBrowserVC.swift in Sources */,
 				00594B4122533E0C006CA687 /* AlbumsCell.swift in Sources */,
