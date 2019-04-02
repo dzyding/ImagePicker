@@ -1,6 +1,6 @@
 //
 //  ImagePickCell.swift
-//  190119_DKImagePickerController
+//  Example
 //
 //  Created by edz on 2019/3/15.
 //  Copyright © 2019 dzy. All rights reserved.
@@ -23,9 +23,8 @@ class ImagePickCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func basicStep() {
+    private func basicStep() {
         let imgView = UIImageView()
-        imgView.backgroundColor = .red
         contentView.addSubview(imgView)
         self.imgView = imgView
         
@@ -34,7 +33,12 @@ class ImagePickCell: UICollectionViewCell {
         }
     }
     
-    func updateViews(_ photo: PHAsset?) {
+    public func updateViews(_ photo: PHAsset?, cache: UIImage?, complete: ((UIImage?) -> ())?) {
+        imgView?.contentMode = .scaleToFill
+        if let cache = cache {
+            imgView?.image = cache
+            return
+        }
         let option = PHImageRequestOptions()
         option.resizeMode = .exact
         option.deliveryMode = .highQualityFormat
@@ -43,7 +47,10 @@ class ImagePickCell: UICollectionViewCell {
         if let photo = photo {
             let manager = PHImageManager.default()
             manager.requestImage(for: photo, targetSize: CGSize(width: 500.0, height: 500.0), contentMode: .aspectFill, options: option) { (image, info) in
-                self.imgView?.image = image
+                DispatchQueue.main.async {
+                    self.imgView?.image = image
+                    complete?(image)
+                }
             }
         }
     }

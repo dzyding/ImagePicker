@@ -1,6 +1,6 @@
 //
 //  DzyImagePickerVC.swift
-//  190119_DKImagePickerController
+//  Example
 //
 //  Created by edz on 2019/1/19.
 //  Copyright © 2019 dzy. All rights reserved.
@@ -45,9 +45,16 @@ public class DzyImagePickerVC: UIViewController {
         }
     }
     
+    /// 缓存
+    public var caches: [UIImage?] = []
+    
     public var album: String?
  
-    public var photos: PHFetchResult<PHAsset>?
+    public var photos: PHFetchResult<PHAsset>? {
+        didSet {
+            caches = [UIImage?](repeating: nil, count: photos?.count ?? 0)
+        }
+    }
     
     private weak var collectionView: UICollectionView?
     
@@ -62,7 +69,6 @@ public class DzyImagePickerVC: UIViewController {
         
         if let _ = photos {
             navigationItem.title = album
-            collectionView?.reloadData()
         }else {
             navigationItem.title = "全部照片"
             checkAuthorization()
@@ -89,7 +95,7 @@ public class DzyImagePickerVC: UIViewController {
             let action = UIAlertAction(title: "是", style: .default) { (_) in
                 alert.dismiss(animated: true, completion: nil)
             }
-            alert.addAction(action)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+            alert.addAction(action)
             present(alert, animated: true, completion: nil)
         case .notDetermined:
             // 尚未请求,立即请求
@@ -104,6 +110,8 @@ public class DzyImagePickerVC: UIViewController {
         case .authorized:
             // 用户已授权
             getPhotoAlbums()
+        @unknown default:
+            break
         }
     }
     
@@ -117,9 +125,30 @@ public class DzyImagePickerVC: UIViewController {
         options.predicate = NSPredicate(format: "mediaType in %@", [PHAssetMediaType.image.rawValue])
         //找到所有相片
         photos = PHAsset.fetchAssets(with: options)
-        self.collectionView?.reloadData()
     }
     
+    //    MARK: - 获取缩略图
+    private func loadCompressionImg(_ photo: PHAsset?, item: Int) {
+        guard let cell = collectionView?.cellForItem(at: IndexPath(item: item, section: 0)) as? ImagePickCell else {return}
+        if let image = caches[item - 1] {
+            cell.imgView?.image = image
+            return
+        }
+        let option = PHImageRequestOptions()
+        option.resizeMode = .fast
+        option.deliveryMode = .fastFormat
+        option.isSynchronous = false
+        
+        if let photo = photo {
+            let manager = PHImageManager.default()
+            manager.requestImage(for: photo, targetSize: CGSize(width: 500.0, height: 500.0), contentMode: .aspectFill, options: option) { [weak self] (image, info) in
+                cell.imgView?.image = image
+                self?.caches[item - 1] = image
+            }
+        }
+    }
+    
+    //    MARK: - UI
     private func setNaviItem() {
         navigationItem.hidesBackButton = true
         
@@ -132,8 +161,7 @@ public class DzyImagePickerVC: UIViewController {
         let rightBtn = UIBarButtonItem(customView: right)
         navigationItem.rightBarButtonItem = rightBtn
         
-        let bundle = Bundle(url: Bundle(for: DzyImagePickerVC.self).url(forResource: "DzyImagePicker", withExtension: "bundle")!)
-        let image = UIImage(contentsOfFile: bundle?.path(forResource: "dzy_back", ofType: "png") ?? "")
+        let image = PickerManager.default.loadImageFromBunlde("back")
         let left = UIButton(type: .custom)
         left.setImage(image, for: .normal)
         left.addTarget(self, action: #selector(backAction), for: .touchUpInside)
@@ -180,38 +208,50 @@ public class DzyImagePickerVC: UIViewController {
             make.left.right.equalTo(0)
         }
     }
-    
-    deinit {
-        // 默认需要裁剪，正方形
-        PickerManager.default.ifCrop = true
-        PickerManager.default.cropScale = 1
-    }
 }
 
 extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource {
     
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photos?.count ?? 0
+        return (photos?.count ?? 0) + 1
     }
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImagePickCell", for: indexPath) as? ImagePickCell
-        cell?.updateViews(photos?.object(at: indexPath.row))
         return cell!
     }
     
+    open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        let cell = cell as? ImagePickCell
+        cell?.imgView?.image = nil
+        if indexPath.item == 0 {
+            cell?.imgView?.contentMode = .scaleAspectFit
+            cell?.imgView?.image = PickerManager.default.loadImageFromBunlde("photo")
+        }else {
+            let row = indexPath.row - 1
+            let photo = photos?.object(at: row)
+            let cache = caches[row]
+            cell?.updateViews(photo, cache: cache, complete: { [weak self] (image) in
+                self?.caches[row] = image
+            })
+        }
+    }
+    
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let photo = photos?.object(at: indexPath.row) else {
+        if indexPath.item == 0 { // 相机
+            let vc = DzyCameraVC()
+            navigationController?.pushViewController(vc, animated: true)
             return
         }
-        if ifCrop {
+        guard let photo = photos?.object(at: indexPath.row - 1) else {return}
+        if ifCrop { // 需裁剪
             var type: CropType = .square
             if cropScale != 1 {
                 type = .rectangle(cropScale)
             }
             let vc = DzyImageBrowserVC(photo, type: type)
             navigationController?.pushViewController(vc, animated: true)
-        }else {
+        }else { // 不需裁剪
             let option = PHImageRequestOptions()
             option.resizeMode = .exact
             option.deliveryMode = .highQualityFormat

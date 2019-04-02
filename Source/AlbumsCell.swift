@@ -1,6 +1,6 @@
 //
 //  AlbumsCell.swift
-//  190119_DKImagePickerController
+//  Example
 //
 //  Created by edz on 2019/3/29.
 //  Copyright © 2019 dzy. All rights reserved.

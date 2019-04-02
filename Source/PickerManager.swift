@@ -1,6 +1,6 @@
 //
 //  PickerManager.swift
-//  190119_DKImagePickerController
+//  Example
 //
 //  Created by edz on 2019/4/1.
 //  Copyright © 2019 dzy. All rights reserved.
@@ -18,4 +18,10 @@ struct PickerManager {
     var ifCrop: Bool = true
     
     weak var delegate: DzyImagePickerVCDelegate?
+    
+    /// 读取 bundle 中的图片
+    public func loadImageFromBunlde(_ name: String) -> UIImage? {
+        let bundle = Bundle(url: Bundle(for: DzyImagePickerVC.self).url(forResource: "DzyImagePicker", withExtension: "bundle")!)
+        return UIImage(contentsOfFile: bundle?.path(forResource: name, ofType: "png") ?? "")
+    }
 }

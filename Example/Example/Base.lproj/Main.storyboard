@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Qg8-hN-c3W">
+                                <rect key="frame" x="82" y="94" width="250" height="250"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="250" id="KXF-3e-F7Z"/>
+                                    <constraint firstAttribute="height" constant="250" id="ymF-tU-rLn"/>
+                                </constraints>
+                            </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EGx-rp-0hh">
+                                <rect key="frame" x="184" y="374" width="46" height="30"/>
+                                <state key="normal" title="长方形"/>
+                                <connections>
+                                    <action selector="rectangleAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="o51-Qa-3P9"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ck8-jV-qti">
+                                <rect key="frame" x="184" y="429" width="46" height="30"/>
+                                <state key="normal" title="正方形"/>
+                                <connections>
+                                    <action selector="squareAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="n9a-ZE-qhe"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qU3-rO-VDR">
+                                <rect key="frame" x="191.5" y="484" width="31" height="30"/>
+                                <state key="normal" title="原图"/>
+                                <connections>
+                                    <action selector="originAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="bm1-Rk-Rg1"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="Qg8-hN-c3W" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="6S9-dr-c5Z"/>
+                            <constraint firstItem="qU3-rO-VDR" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="F7V-Wp-4Vc"/>
+                            <constraint firstItem="ck8-jV-qti" firstAttribute="top" secondItem="EGx-rp-0hh" secondAttribute="bottom" constant="25" id="Ghu-Ez-I7z"/>
+                            <constraint firstItem="EGx-rp-0hh" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="QbR-RJ-v74"/>
+                            <constraint firstItem="Qg8-hN-c3W" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="50" id="fNi-kE-SnJ"/>
+                            <constraint firstItem="EGx-rp-0hh" firstAttribute="top" secondItem="Qg8-hN-c3W" secondAttribute="bottom" constant="30" id="sAN-9E-c5Y"/>
+                            <constraint firstItem="qU3-rO-VDR" firstAttribute="top" secondItem="ck8-jV-qti" secondAttribute="bottom" constant="25" id="sBQ-nA-vhB"/>
+                            <constraint firstItem="ck8-jV-qti" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="xS2-VB-g9O"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                    </view>
+                    <connections>
+                        <outlet property="imgView" destination="Qg8-hN-c3W" id="N9J-69-0dv"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>
