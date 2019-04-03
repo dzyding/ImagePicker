@@ -14,6 +14,7 @@
 		00594AD122533B47006CA687 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00594ACF22533B47006CA687 /* LaunchScreen.storyboard */; };
 		00594B3C22533E0C006CA687 /* PickerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00594B3322533E0B006CA687 /* PickerManager.swift */; };
 		00594B4322533E0C006CA687 /* DzyImagePicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 00594B3B22533E0C006CA687 /* DzyImagePicker.bundle */; };
+		007374E822549CA700C3D456 /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374E722549CA700C3D456 /* FocusView.swift */; };
 		00EB093F22543E6A00404703 /* TakePhotoBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093622543E6A00404703 /* TakePhotoBtn.swift */; };
 		00EB094022543E6A00404703 /* CancelBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093722543E6A00404703 /* CancelBtn.swift */; };
 		00EB094122543E6A00404703 /* ImagePickCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093822543E6A00404703 /* ImagePickCell.swift */; };
@@ -35,6 +36,7 @@
 		00594AD222533B47006CA687 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00594B3322533E0B006CA687 /* PickerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerManager.swift; sourceTree = "<group>"; };
 		00594B3B22533E0C006CA687 /* DzyImagePicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DzyImagePicker.bundle; sourceTree = "<group>"; };
+		007374E722549CA700C3D456 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		00EB093622543E6A00404703 /* TakePhotoBtn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TakePhotoBtn.swift; sourceTree = "<group>"; };
 		00EB093722543E6A00404703 /* CancelBtn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CancelBtn.swift; sourceTree = "<group>"; };
 		00EB093822543E6A00404703 /* ImagePickCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickCell.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				00EB093722543E6A00404703 /* CancelBtn.swift */,
 				00EB093822543E6A00404703 /* ImagePickCell.swift */,
 				00EB093922543E6A00404703 /* AlbumsCell.swift */,
+				007374E722549CA700C3D456 /* FocusView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				00EB094022543E6A00404703 /* CancelBtn.swift in Sources */,
 				00594AC922533B45006CA687 /* ViewController.swift in Sources */,
 				00EB094222543E6A00404703 /* AlbumsCell.swift in Sources */,
+				007374E822549CA700C3D456 /* FocusView.swift in Sources */,
 				00EB094622543E6A00404703 /* DzyImagePickerVC.swift in Sources */,
 				00EB094322543E6A00404703 /* DzyCameraVC.swift in Sources */,
 				00594AC722533B45006CA687 /* AppDelegate.swift in Sources */,

@@ -172,9 +172,56 @@ class DzyCameraVC: UIViewController {
     }
     
     //    MARK: - 对焦
+    @objc private func tapAction(_ tap: UITapGestureRecognizer) {
+        if view.viewWithTag(99) != nil {
+            return
+        }
+        let size = UIScreen.main.bounds.size
+        let point = tap.location(in: view)
+        let x = point.x / size.width
+        let y = point.y / size.height
+        showFocusView(point)
+        focusAction(CGPoint(x: x, y: y))
+    }
+    
+    private func focusAction(_ point: CGPoint) {
+        do {
+            try device?.lockForConfiguration()
+            if device?.isFocusPointOfInterestSupported == true,
+                device?.isFocusModeSupported(.autoFocus) == true
+            {
+                device?.focusPointOfInterest = point
+                device?.focusMode = .autoFocus
+            }
+            
+            if device?.isExposurePointOfInterestSupported == true,
+                device?.isExposureModeSupported(.autoExpose) == true
+            {
+                device?.exposurePointOfInterest = point
+                device?.exposureMode = .autoExpose
+            }
+            device?.unlockForConfiguration()
+        }catch {
+            print(error)
+        }
+    }
+    
+    private func showFocusView(_ point: CGPoint) {
+        let frame = CGRect(x: 0, y: 0, width: 150.0, height: 150.0)
+        let focusV = FocusView(frame: frame)
+        focusV.tag = 99
+        view.addSubview(focusV)
+        var center = point
+        center.x += 150.0 / 4.0
+        focusV.center = center
+    }
     
     //    MARK: - 界面设置
     private func setUI() {
+        view.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction(_:)))
+        view.addGestureRecognizer(tap)
+        
         let takePhotoBtn = TakePhotoBtn(type: .custom)
         takePhotoBtn.addTarget(self, action: #selector(takePhotoAction), for: .touchUpInside)
         view.addSubview(takePhotoBtn)
