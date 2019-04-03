@@ -216,11 +216,50 @@ class DzyCameraVC: UIViewController {
         focusV.center = center
     }
     
+    //    MARK: - 调整曝光
+    @objc private func panAction(_ pan: UIPanGestureRecognizer) {
+        guard let focusV = view.viewWithTag(99) as? FocusView else {return}
+        var begin: CGPoint = .zero
+        switch pan.state {
+        case .began:
+            begin = pan.translation(in: view)
+        case .changed:
+            focusV.lastTime = Date().timeIntervalSince1970
+            let now = pan.translation(in: view)
+            let change = now.y - begin.y
+            exposureAction(change)
+        case .ended:
+            focusV.updateLastTime()
+        default:
+            break
+        }
+    }
+    
+    private func exposureAction(_ change: CGFloat) {
+        var bias = device?.exposureTargetBias ?? 0
+        bias += Float(change / 1000.0)
+        if bias > 3.0 {
+            bias = 3.0
+        }else if bias < -3.0 {
+            bias = -3.0
+        }
+        do {
+            try device?.lockForConfiguration()
+            device?.setExposureTargetBias(bias, completionHandler: nil)
+            device?.unlockForConfiguration()
+        }catch {
+            print(error)
+        }
+    }
+    
     //    MARK: - 界面设置
     private func setUI() {
         view.isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction(_:)))
         view.addGestureRecognizer(tap)
+        
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(panAction(_:)))
+        view.addGestureRecognizer(pan)
         
         let takePhotoBtn = TakePhotoBtn(type: .custom)
         takePhotoBtn.addTarget(self, action: #selector(takePhotoAction), for: .touchUpInside)
