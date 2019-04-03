@@ -12,9 +12,9 @@ import AVFoundation
 
 class DzyCameraVC: UIViewController {
     
-    weak var previewLayer: AVCaptureVideoPreviewLayer?
+    private weak var previewLayer: AVCaptureVideoPreviewLayer?
     
-    lazy var session: AVCaptureSession = {
+    private lazy var session: AVCaptureSession = {
         let s = AVCaptureSession()
         if s.canSetSessionPreset(.hd4K3840x2160) {
             s.sessionPreset = .hd4K3840x2160
@@ -32,14 +32,27 @@ class DzyCameraVC: UIViewController {
     
     private weak var output: AVCaptureOutput?
     
+    // 隐藏状态栏
+    override public var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        setNeedsStatusBarAppearanceUpdate()
+        
         setUI()
         setCamera()
     }
     
+    override public func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
     //    MARK: - 拍照的设置
-    func setCamera() {
+    private func setCamera() {
         if let device = device {
             do {
                 let layer = AVCaptureVideoPreviewLayer(session: session)
@@ -77,7 +90,7 @@ class DzyCameraVC: UIViewController {
     }
     
     //    MARK: - 拍照
-    @objc func takePhoto() {
+    @objc open func takePhotoAction() {
         if #available(iOS 10.0, *) {
             if let output = output as? AVCapturePhotoOutput {
                 let settings: AVCapturePhotoSettings = {
@@ -108,16 +121,53 @@ class DzyCameraVC: UIViewController {
         }
     }
     
+    //    MARK: - 转动摄像头
+    @objc open func rotateCameraAction() {
+        
+    }
+    
+    //    MARK: - 取消
+    @objc open func cancelAction() {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    //    MARK: - 旋转相机
+    @objc open func rotateAction() {
+        print("旋转")
+    }
+    
     //    MARK: - 界面设置
     private func setUI() {
-        let btn = TakePhotoBtn(type: .custom)
-        btn.addTarget(self, action: #selector(takePhoto), for: .touchUpInside)
-        view.addSubview(btn)
+        let takePhotoBtn = TakePhotoBtn(type: .custom)
+        takePhotoBtn.addTarget(self, action: #selector(takePhotoAction), for: .touchUpInside)
+        view.addSubview(takePhotoBtn)
         
-        btn.snp.makeConstraints { (make) in
-            make.width.height.equalTo(100)
+        let cancelBtn = CancelBtn(type: .custom)
+        cancelBtn.addTarget(self, action: #selector(cancelAction), for: .touchUpInside)
+        view.addSubview(cancelBtn)
+        
+        let rotate = PickerManager.default.loadImageFromBunlde("rotate")
+        let rotateBtn = UIButton(type: .custom)
+        rotateBtn.setImage(rotate, for: .normal)
+        rotateBtn.addTarget(self, action: #selector(rotateAction), for: .touchUpInside)
+        view.addSubview(rotateBtn)
+        
+        takePhotoBtn.snp.makeConstraints { (make) in
+            make.width.height.equalTo(80)
             make.centerX.equalTo(view)
             make.bottom.equalTo(-50)
+        }
+        
+        cancelBtn.snp.makeConstraints { (make) in
+            make.width.height.equalTo(70)
+            make.centerY.equalTo(takePhotoBtn)
+            make.right.equalTo(takePhotoBtn.snp.left).offset(-30)
+        }
+        
+        rotateBtn.snp.makeConstraints { (make) in
+            make.top.equalTo(view).offset(50)
+            make.right.equalTo(view).offset(-20)
+            make.width.height.equalTo(60)
         }
     }
 }

@@ -8,6 +8,13 @@
 
 import UIKit
 
+@objc public protocol DzyImagePickerVCDelegate {
+    /// 裁剪过的
+    func imagePicker(_ picker: DzyImagePickerVC?, getCropImage image: UIImage)
+    /// 原始图片
+    func imagePicker(_ picker: DzyImagePickerVC?, getOriginImage image: UIImage)
+}
+
 /// 统一保存，不然几个界面间跳转的时候，需要传来传去的
 struct PickerManager {
     

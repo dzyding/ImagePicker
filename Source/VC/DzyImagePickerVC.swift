@@ -10,13 +10,6 @@ import UIKit
 import Photos
 import SnapKit
 
-@objc public protocol DzyImagePickerVCDelegate {
-    /// 裁剪过的
-    func imagePicker(_ picker: DzyImagePickerVC?, getCropImage image: UIImage)
-    /// 原始图片
-    func imagePicker(_ picker: DzyImagePickerVC?, getOriginImage image: UIImage)
-}
-
 public class DzyImagePickerVC: UIViewController {
     /// 代理
     public weak var delegate: DzyImagePickerVCDelegate? {
@@ -90,23 +83,20 @@ public class DzyImagePickerVC: UIViewController {
         let status = PHPhotoLibrary.authorizationStatus()
         switch status {
         case .denied:
-        // 用户拒绝,提示开启
-            let alert = UIAlertController(title: "请前往设置界面开启访问权限", message: "", preferredStyle: .alert)
-            let action = UIAlertAction(title: "是", style: .default) { (_) in
-                alert.dismiss(animated: true, completion: nil)
-            }
-            alert.addAction(action)
-            present(alert, animated: true, completion: nil)
+            // 用户拒绝,提示开启
+            gotoSettingsAction()
         case .notDetermined:
             // 尚未请求,立即请求
             PHPhotoLibrary.requestAuthorization({ (status) -> Void in
                 if status == .authorized {
-                    self.getPhotoAlbums()
+                    self.getPhotoAlbums(true)
+                }else {
+                    self.gotoSettingsAction()
                 }
             })
         case .restricted:
             // 应用程序无权访问
-            print("restricted")
+            gotoSettingsAction()
         case .authorized:
             // 用户已授权
             getPhotoAlbums()
@@ -115,8 +105,21 @@ public class DzyImagePickerVC: UIViewController {
         }
     }
     
+    //    MARK: - 前往设置界面
+    private func gotoSettingsAction() {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "提示", message: "请前往设置应用中开启对应的访问权限", preferredStyle: .alert)
+            let action = UIAlertAction(title: "是", style: .default) { [weak self] (_) in
+                alert.dismiss(animated: true, completion: nil)
+                self?.dismiss(animated: true, completion: nil)
+            }
+            alert.addAction(action)
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
     //    MARK: - 获取所有相册
-    private func getPhotoAlbums() {
+    private func getPhotoAlbums(_ ifReload: Bool = false) {
         //创建一个PHFetchOptions对象检索照片
         let options = PHFetchOptions()
         //通过创建时间来检索
@@ -125,6 +128,12 @@ public class DzyImagePickerVC: UIViewController {
         options.predicate = NSPredicate(format: "mediaType in %@", [PHAssetMediaType.image.rawValue])
         //找到所有相片
         photos = PHAsset.fetchAssets(with: options)
+        
+        if ifReload {
+            DispatchQueue.main.async {
+                self.collectionView?.reloadData()
+            }
+        }
     }
     
     //    MARK: - 获取缩略图
