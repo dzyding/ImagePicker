@@ -21,8 +21,8 @@ class CancelBtn: UIButton {
     
     override func draw(_ rect: CGRect) {
         let context = UIGraphicsGetCurrentContext()
-        let width: CGFloat = 32.0
-        let height: CGFloat = 15.0
+        let width: CGFloat = 28.0
+        let height: CGFloat = 13.0
         let rect = CGRect(x: (bounds.size.width - width) / 2.0, y: (bounds.size.height - height) / 2.0, width: width, height: height)
         context?.setLineWidth(2)
         context?.setStrokeColor(UIColor.white.cgColor)

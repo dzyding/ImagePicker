@@ -11,25 +11,13 @@ import SnapKit
 import AVFoundation
 
 class DzyCameraVC: UIViewController {
-    
+    /// 展示层
     private weak var previewLayer: AVCaptureVideoPreviewLayer?
-    
-    private lazy var session: AVCaptureSession = {
-        let s = AVCaptureSession()
-        if s.canSetSessionPreset(.hd4K3840x2160) {
-            s.sessionPreset = .hd4K3840x2160
-        }else if s.canSetSessionPreset(.hd1920x1080) {
-            s.sessionPreset = .hd1920x1080
-        }else if s.canSetSessionPreset(.hd1280x720) {
-            s.sessionPreset = .hd1280x720
-        }else {
-            s.sessionPreset = .high
-        }
-        return s
-    }()
-    
+    /// 当前使用设备
     private var device = AVCaptureDevice.default(for: .video)
     
+    private lazy var session = AVCaptureSession()
+    /// 输出模式
     private weak var output: AVCaptureOutput?
     
     // 隐藏状态栏
@@ -61,12 +49,12 @@ class DzyCameraVC: UIViewController {
                 view.layer.insertSublayer(layer, at: 0)
                 self.previewLayer = layer
                 
+                updatePresetAction(device)
                 let deviceInput = try AVCaptureDeviceInput(device: device)
                 if session.canAddInput(deviceInput)
                 {
                     session.addInput(deviceInput)
                 }
-                
                 
                 if #available(iOS 10.0, *) {
                     let output = AVCapturePhotoOutput()
@@ -121,11 +109,6 @@ class DzyCameraVC: UIViewController {
         }
     }
     
-    //    MARK: - 转动摄像头
-    @objc open func rotateCameraAction() {
-        
-    }
-    
     //    MARK: - 取消
     @objc open func cancelAction() {
         navigationController?.popViewController(animated: true)
@@ -133,8 +116,62 @@ class DzyCameraVC: UIViewController {
     
     //    MARK: - 旋转相机
     @objc open func rotateAction() {
-        print("旋转")
+        func getCamera(_ position: AVCaptureDevice.Position) -> AVCaptureDevice? {
+            var arr: [AVCaptureDevice.DeviceType] = []
+            if #available(iOS 11.1, *) {
+                arr = [.builtInTrueDepthCamera, .builtInDualCamera, .builtInTelephotoCamera, .builtInWideAngleCamera]
+            }else if #available(iOS 10.2, *) {
+                arr = [.builtInDualCamera, .builtInTelephotoCamera, .builtInWideAngleCamera]
+            }else {
+                arr = [.builtInTelephotoCamera, .builtInWideAngleCamera]
+            }
+            // 从高到低
+            for type in arr {
+                if let device = AVCaptureDevice.default(type, for: .video, position: position) {
+                    return device
+                }
+            }
+            return nil
+        }
+        if let device = device {
+            var newDevice: AVCaptureDevice?
+            if device.position == .back {
+                newDevice = getCamera(.front)
+            }else {
+                newDevice = getCamera(.back)
+            }
+            if let newDevice = newDevice,
+                let oldInput = session.inputs.first
+            {
+                do {
+                    self.device = newDevice
+                    let newInput = try AVCaptureDeviceInput(device: newDevice)
+                    session.beginConfiguration()
+                    session.removeInput(oldInput)
+                    updatePresetAction(newDevice)
+                    session.addInput(newInput)
+                    session.commitConfiguration()
+                }catch {
+                    print(error)
+                }
+            }
+        }
     }
+    
+    //    MARK: - 预更改分辨率
+    func updatePresetAction(_ device: AVCaptureDevice) {
+        if session.canSetSessionPreset(.hd4K3840x2160) && device.supportsSessionPreset(.hd4K3840x2160) {
+            session.sessionPreset = .hd4K3840x2160
+        }else if session.canSetSessionPreset(.hd1920x1080) && device.supportsSessionPreset(.hd1920x1080) {
+            session.sessionPreset = .hd1920x1080
+        }else if session.canSetSessionPreset(.hd1280x720) && device.supportsSessionPreset(.hd1280x720) {
+            session.sessionPreset = .hd1280x720
+        }else {
+            session.sessionPreset = .high
+        }
+    }
+    
+    //    MARK: - 对焦
     
     //    MARK: - 界面设置
     private func setUI() {
@@ -165,20 +202,31 @@ class DzyCameraVC: UIViewController {
         }
         
         rotateBtn.snp.makeConstraints { (make) in
-            make.top.equalTo(view).offset(50)
+            make.top.equalTo(view).offset(20)
             make.right.equalTo(view).offset(-20)
-            make.width.height.equalTo(60)
+            make.width.height.equalTo(50)
         }
     }
 }
 
 extension DzyCameraVC: AVCapturePhotoCaptureDelegate {
 
+    @available(iOS 11.0, *)
     open func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let data = photo.fileDataRepresentation(),
             let image = UIImage(data: data)
         {
             UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+        }
+    }
+    
+    // iOS 10.0
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?, previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings?, error: Error?) {
+        if let buffer = photoSampleBuffer,
+            let jpegData = AVCapturePhotoOutput.jpegPhotoDataRepresentation(forJPEGSampleBuffer: buffer, previewPhotoSampleBuffer: previewPhotoSampleBuffer),
+            let image = UIImage(data: jpegData)
+        {
+            UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
         }
     }
     
