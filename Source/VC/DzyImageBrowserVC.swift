@@ -36,7 +36,7 @@ public class DzyImageBrowserVC: UIViewController {
     // 最小缩放值
     private let minSize: CGFloat = 50.0
     // iPhone 原始图片数据
-    private let photo: PHAsset
+    private let photo: AnyObject
     // 缩放图片用的
     private weak var scrollView: UIScrollView?
     // 显示图片用的
@@ -70,7 +70,7 @@ public class DzyImageBrowserVC: UIViewController {
         }
     }()
     
-    init(_ photo: PHAsset, type: CropType = .square) {
+    init(_ photo: AnyObject, type: CropType = .square) {
         self.photo = photo
         self.type = type
         super.init(nibName: nil, bundle: nil)
@@ -90,21 +90,21 @@ public class DzyImageBrowserVC: UIViewController {
         loadImage()
     }
     
-    override public func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
     //    MARK: - 读取照片
     private func loadImage() {
-        let manager = PHImageManager.default()
-        let size = CGSize(width: photo.pixelWidth, height: photo.pixelHeight)
-        let option = PHImageRequestOptions()
-        option.resizeMode = .exact
-        option.deliveryMode = .highQualityFormat
-        option.isSynchronous = true
-        manager.requestImage(for: photo, targetSize: size, contentMode: .aspectFit, options: option) { (image, info) in
-            self.updateViews(image)
+        if let photo = photo as? PHAsset {
+            let manager = PHImageManager.default()
+            let size = CGSize(width: photo.pixelWidth, height: photo.pixelHeight)
+            let option = PHImageRequestOptions()
+            option.resizeMode = .exact
+            option.deliveryMode = .highQualityFormat
+            option.isSynchronous = true
+            manager.requestImage(for: photo, targetSize: size, contentMode: .aspectFit, options: option) { (image, info) in
+                self.updateViews(image)
+            }
+        }
+        if let photo = photo as? UIImage {
+            updateViews(photo)
         }
     }
     

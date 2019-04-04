@@ -42,11 +42,6 @@ class DzyCameraVC: UIViewController {
         setCamera()
     }
     
-    override public func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
     //    MARK: - 拍照的设置
     private func setCamera() {
         if let device = device {
@@ -105,12 +100,12 @@ class DzyCameraVC: UIViewController {
                 let connection = output.connection(with: .video)
             {
                 connection.videoOrientation = .portrait
-                output.captureStillImageAsynchronously(from: connection) { (buffer, error) in
+                output.captureStillImageAsynchronously(from: connection) { [weak self] (buffer, error) in
                     if let buffer = buffer,
                         let jpegData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer),
                         let image = UIImage(data: jpegData)
                     {
-                        UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
+                        self?.saveAndNextAction(image)
                     }
                 }
             }
@@ -269,6 +264,25 @@ class DzyCameraVC: UIViewController {
         }
     }
     
+    //    MARK: - 保存照片，并根据参数判断是否跳转到裁剪界面
+    private func saveAndNextAction(_ image: UIImage) {
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+        DispatchQueue.main.async {
+            let manager = PickerManager.default
+            if manager.ifCrop { // 需裁剪
+                var type: CropType = .square
+                if manager.cropScale != 1 {
+                    type = .rectangle(manager.cropScale)
+                }
+                let vc = DzyImageBrowserVC(image, type: type)
+                self.navigationController?.pushViewController(vc, animated: true)
+            }else {
+                self.dismiss(animated: true, completion: nil)
+                manager.delegate?.imagePicker(nil, getOriginImage: image)
+            }
+        }
+    }
+    
     //    MARK: - 界面设置
     private func setUI() {
         view.isUserInteractionEnabled = true
@@ -319,7 +333,7 @@ extension DzyCameraVC: AVCapturePhotoCaptureDelegate {
         if let data = photo.fileDataRepresentation(),
             let image = UIImage(data: data)
         {
-            UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+            saveAndNextAction(image)
         }
     }
     
@@ -329,7 +343,7 @@ extension DzyCameraVC: AVCapturePhotoCaptureDelegate {
             let jpegData = AVCapturePhotoOutput.jpegPhotoDataRepresentation(forJPEGSampleBuffer: buffer, previewPhotoSampleBuffer: previewPhotoSampleBuffer),
             let image = UIImage(data: jpegData)
         {
-            UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
+            saveAndNextAction(image)
         }
     }
     

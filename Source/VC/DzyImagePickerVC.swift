@@ -68,6 +68,11 @@ public class DzyImagePickerVC: UIViewController {
         }
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
     //    MARK: - 取消
     @objc private func cancelAction() {
         dismiss(animated: true, completion: nil)
