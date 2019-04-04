@@ -15,6 +15,8 @@ class FocusView: UIView {
     // 是否需要移除
     public var lastTime: Double?
     
+    private weak var sunIV: UIImageView?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .clear
@@ -27,6 +29,7 @@ class FocusView: UIView {
     
     override func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
+        showOrHideLine(true)
         transform = transform.scaledBy(x: 1.3, y: 1.3)
     }
     
@@ -51,40 +54,66 @@ class FocusView: UIView {
         if let lastTime = lastTime,
             now - lastTime >= 1
         {
+            sunIV?.snp.updateConstraints({ (make) in
+                make.centerY.equalTo(self).offset(0)
+            })
             removeFromSuperview()
         }
     }
     
+    //    MARK: - 调整太阳的位置
+    public func updateSunLocation(_ dias: Float) {
+        showOrHideLine(false)
+        let max = (bounds.size.height - 25.0) / 2.0
+        let x = CGFloat(dias / 3.0)
+        sunIV?.snp.updateConstraints({ (make) in
+            make.centerY.equalTo(self).offset(x * max)
+        })
+    }
+    
+    //    MARK: - 隐藏，显示 上下的线条
+    private func showOrHideLine(_ ifShow: Bool) {
+        (77...78).forEach { (tag) in
+            if let line = viewWithTag(tag) {
+                line.isHidden = ifShow
+            }
+        }
+    }
+    
+    //    MARK: - UI
     private func setUI() {
         let topLine = UIView()
         topLine.backgroundColor = color
+        topLine.tag = 77
         addSubview(topLine)
         
         let bottomLine = UIView()
         bottomLine.backgroundColor = color
+        bottomLine.tag = 78
         addSubview(bottomLine)
         
         let image = PickerManager.default.loadImageFromBunlde("sun")
         let imgView = UIImageView(image: image)
         imgView.contentMode = .scaleAspectFit
         addSubview(imgView)
+        self.sunIV = imgView
         
-        let x = bounds.size.width / 4.0
+        let x = bounds.size.width / 2.0
         imgView.snp.makeConstraints { (make) in
-            make.left.equalTo(x * 3.0 - 12.5)
+            make.left.equalTo(x + 12.5)
             make.height.width.equalTo(25.0)
             make.centerY.equalTo(self)
         }
         
         topLine.snp.makeConstraints { (make) in
-            make.right.equalTo(-x)
+            make.centerX.equalTo(imgView)
             make.top.equalTo(0)
             make.width.equalTo(1)
             make.bottom.equalTo(imgView.snp.top)
         }
         
         bottomLine.snp.makeConstraints { (make) in
-            make.right.width.equalTo(topLine)
+            make.centerX.width.equalTo(topLine)
             make.bottom.equalTo(0)
             make.top.equalTo(imgView.snp.bottom)
         }

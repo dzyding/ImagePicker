@@ -25,6 +25,14 @@ class DzyCameraVC: UIViewController {
         return true
     }
     
+    // 对焦视图
+    private lazy var focusView: FocusView = {
+        let frame = CGRect(x: 0, y: 0, width: 150.0, height: 150.0)
+        let focusV = FocusView(frame: frame)
+        focusV.tag = 99
+        return focusV
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.setNavigationBarHidden(true, animated: false)
@@ -187,6 +195,9 @@ class DzyCameraVC: UIViewController {
     private func focusAction(_ point: CGPoint) {
         do {
             try device?.lockForConfiguration()
+            // 每次对焦 还原
+            device?.setExposureTargetBias(0, completionHandler: nil)
+            
             if device?.isFocusPointOfInterestSupported == true,
                 device?.isFocusModeSupported(.autoFocus) == true
             {
@@ -207,27 +218,25 @@ class DzyCameraVC: UIViewController {
     }
     
     private func showFocusView(_ point: CGPoint) {
-        let frame = CGRect(x: 0, y: 0, width: 150.0, height: 150.0)
-        let focusV = FocusView(frame: frame)
-        focusV.tag = 99
-        view.addSubview(focusV)
+        view.addSubview(focusView)
         var center = point
         center.x += 150.0 / 4.0
-        focusV.center = center
+        focusView.center = center
     }
     
     //    MARK: - 调整曝光
     @objc private func panAction(_ pan: UIPanGestureRecognizer) {
         guard let focusV = view.viewWithTag(99) as? FocusView else {return}
-        var begin: CGPoint = .zero
+        var last: CGPoint = .zero
         switch pan.state {
         case .began:
-            begin = pan.translation(in: view)
+            last = pan.translation(in: view)
         case .changed:
             focusV.lastTime = Date().timeIntervalSince1970
             let now = pan.translation(in: view)
-            let change = now.y - begin.y
+            let change = last.y - now.y
             exposureAction(change)
+            last = now
         case .ended:
             focusV.updateLastTime()
         default:
@@ -237,7 +246,8 @@ class DzyCameraVC: UIViewController {
     
     private func exposureAction(_ change: CGFloat) {
         var bias = device?.exposureTargetBias ?? 0
-        bias += Float(change / 1000.0)
+        let x = Float(change / 2000.0)
+        bias += x
         if bias > 3.0 {
             bias = 3.0
         }else if bias < -3.0 {
@@ -245,10 +255,17 @@ class DzyCameraVC: UIViewController {
         }
         do {
             try device?.lockForConfiguration()
+            updateSunLocation(bias)
             device?.setExposureTargetBias(bias, completionHandler: nil)
             device?.unlockForConfiguration()
         }catch {
             print(error)
+        }
+    }
+    
+    private func updateSunLocation(_ bias: Float) {
+        if let v = view.viewWithTag(99) as? FocusView {
+            v.updateSunLocation(-bias)
         }
     }
     
