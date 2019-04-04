@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
  s.name         = 'DzyImagePicker'
 
- s.version      = '1.0.6'
+ s.version      = '1.0.7'
 
  s.summary      = 'image picker'
 
@@ -16,15 +16,15 @@ Pod::Spec.new do |s|
 
  s.author       = '灰s'
 
- s.platform     = :ios, '9.0'
+ s.platform     = :ios, '10.0'
 
- s.source        = { :git => 'https://github.com/dzyding/ImagePicker.git', :tag => '1.0.6' }
+ s.source        = { :git => 'https://github.com/dzyding/ImagePicker.git', :tag => '1.0.7' }
 
  s.source_files  = 'Source/*.swift'
 
  s.resources     = 'Resources/*.*'  
 
- s.swift_version = '4.2'
+ s.swift_version = '5.0'
 
  s.dependency 'SnapKit', '~> 4.2.0'
 

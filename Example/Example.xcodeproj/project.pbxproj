@@ -14,15 +14,15 @@
 		00594AD122533B47006CA687 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00594ACF22533B47006CA687 /* LaunchScreen.storyboard */; };
 		00594B3C22533E0C006CA687 /* PickerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00594B3322533E0B006CA687 /* PickerManager.swift */; };
 		00594B4322533E0C006CA687 /* DzyImagePicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 00594B3B22533E0C006CA687 /* DzyImagePicker.bundle */; };
-		007374E822549CA700C3D456 /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374E722549CA700C3D456 /* FocusView.swift */; };
-		00EB093F22543E6A00404703 /* TakePhotoBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093622543E6A00404703 /* TakePhotoBtn.swift */; };
-		00EB094022543E6A00404703 /* CancelBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093722543E6A00404703 /* CancelBtn.swift */; };
-		00EB094122543E6A00404703 /* ImagePickCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093822543E6A00404703 /* ImagePickCell.swift */; };
-		00EB094222543E6A00404703 /* AlbumsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093922543E6A00404703 /* AlbumsCell.swift */; };
-		00EB094322543E6A00404703 /* DzyCameraVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093B22543E6A00404703 /* DzyCameraVC.swift */; };
-		00EB094422543E6A00404703 /* DzyImageBrowserVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093C22543E6A00404703 /* DzyImageBrowserVC.swift */; };
-		00EB094522543E6A00404703 /* DzyAlbumsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093D22543E6A00404703 /* DzyAlbumsVC.swift */; };
-		00EB094622543E6A00404703 /* DzyImagePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EB093E22543E6A00404703 /* DzyImagePickerVC.swift */; };
+		007374F22255B22B00C3D456 /* DzyImagePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374E92255B22B00C3D456 /* DzyImagePickerVC.swift */; };
+		007374F32255B22B00C3D456 /* DzyImageBrowserVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374EA2255B22B00C3D456 /* DzyImageBrowserVC.swift */; };
+		007374F42255B22B00C3D456 /* DzyAlbumsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374EB2255B22B00C3D456 /* DzyAlbumsVC.swift */; };
+		007374F52255B22B00C3D456 /* TakePhotoBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374EC2255B22B00C3D456 /* TakePhotoBtn.swift */; };
+		007374F62255B22B00C3D456 /* ImagePickCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374ED2255B22B00C3D456 /* ImagePickCell.swift */; };
+		007374F72255B22B00C3D456 /* AlbumsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374EE2255B22B00C3D456 /* AlbumsCell.swift */; };
+		007374F82255B22B00C3D456 /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374EF2255B22B00C3D456 /* FocusView.swift */; };
+		007374F92255B22B00C3D456 /* DzyCameraVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374F02255B22B00C3D456 /* DzyCameraVC.swift */; };
+		007374FA2255B22B00C3D456 /* CancelBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374F12255B22B00C3D456 /* CancelBtn.swift */; };
 		8E9EA93292D1A42CBE52CD17 /* Pods_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2937F5BB67B2F35D2D4BA72A /* Pods_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -36,15 +36,15 @@
 		00594AD222533B47006CA687 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00594B3322533E0B006CA687 /* PickerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerManager.swift; sourceTree = "<group>"; };
 		00594B3B22533E0C006CA687 /* DzyImagePicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DzyImagePicker.bundle; sourceTree = "<group>"; };
-		007374E722549CA700C3D456 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
-		00EB093622543E6A00404703 /* TakePhotoBtn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TakePhotoBtn.swift; sourceTree = "<group>"; };
-		00EB093722543E6A00404703 /* CancelBtn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CancelBtn.swift; sourceTree = "<group>"; };
-		00EB093822543E6A00404703 /* ImagePickCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickCell.swift; sourceTree = "<group>"; };
-		00EB093922543E6A00404703 /* AlbumsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumsCell.swift; sourceTree = "<group>"; };
-		00EB093B22543E6A00404703 /* DzyCameraVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DzyCameraVC.swift; sourceTree = "<group>"; };
-		00EB093C22543E6A00404703 /* DzyImageBrowserVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DzyImageBrowserVC.swift; sourceTree = "<group>"; };
-		00EB093D22543E6A00404703 /* DzyAlbumsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DzyAlbumsVC.swift; sourceTree = "<group>"; };
-		00EB093E22543E6A00404703 /* DzyImagePickerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DzyImagePickerVC.swift; sourceTree = "<group>"; };
+		007374E92255B22B00C3D456 /* DzyImagePickerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DzyImagePickerVC.swift; sourceTree = "<group>"; };
+		007374EA2255B22B00C3D456 /* DzyImageBrowserVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DzyImageBrowserVC.swift; sourceTree = "<group>"; };
+		007374EB2255B22B00C3D456 /* DzyAlbumsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DzyAlbumsVC.swift; sourceTree = "<group>"; };
+		007374EC2255B22B00C3D456 /* TakePhotoBtn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TakePhotoBtn.swift; sourceTree = "<group>"; };
+		007374ED2255B22B00C3D456 /* ImagePickCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickCell.swift; sourceTree = "<group>"; };
+		007374EE2255B22B00C3D456 /* AlbumsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumsCell.swift; sourceTree = "<group>"; };
+		007374EF2255B22B00C3D456 /* FocusView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
+		007374F02255B22B00C3D456 /* DzyCameraVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DzyCameraVC.swift; sourceTree = "<group>"; };
+		007374F12255B22B00C3D456 /* CancelBtn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CancelBtn.swift; sourceTree = "<group>"; };
 		11232D161F68188D67BE3DE2 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		2937F5BB67B2F35D2D4BA72A /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6C3FE6ADC9E41ECC951E35E /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -99,8 +99,15 @@
 			isa = PBXGroup;
 			children = (
 				00594B3322533E0B006CA687 /* PickerManager.swift */,
-				00EB093A22543E6A00404703 /* VC */,
-				00EB093522543E6A00404703 /* View */,
+				007374EB2255B22B00C3D456 /* DzyAlbumsVC.swift */,
+				007374E92255B22B00C3D456 /* DzyImagePickerVC.swift */,
+				007374EA2255B22B00C3D456 /* DzyImageBrowserVC.swift */,
+				007374F02255B22B00C3D456 /* DzyCameraVC.swift */,
+				007374EE2255B22B00C3D456 /* AlbumsCell.swift */,
+				007374ED2255B22B00C3D456 /* ImagePickCell.swift */,
+				007374EF2255B22B00C3D456 /* FocusView.swift */,
+				007374F12255B22B00C3D456 /* CancelBtn.swift */,
+				007374EC2255B22B00C3D456 /* TakePhotoBtn.swift */,
 			);
 			name = Source;
 			path = ../../Source;
@@ -113,29 +120,6 @@
 			);
 			name = Resources;
 			path = ../../Resources;
-			sourceTree = "<group>";
-		};
-		00EB093522543E6A00404703 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				00EB093622543E6A00404703 /* TakePhotoBtn.swift */,
-				00EB093722543E6A00404703 /* CancelBtn.swift */,
-				00EB093822543E6A00404703 /* ImagePickCell.swift */,
-				00EB093922543E6A00404703 /* AlbumsCell.swift */,
-				007374E722549CA700C3D456 /* FocusView.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		00EB093A22543E6A00404703 /* VC */ = {
-			isa = PBXGroup;
-			children = (
-				00EB093B22543E6A00404703 /* DzyCameraVC.swift */,
-				00EB093C22543E6A00404703 /* DzyImageBrowserVC.swift */,
-				00EB093D22543E6A00404703 /* DzyAlbumsVC.swift */,
-				00EB093E22543E6A00404703 /* DzyImagePickerVC.swift */,
-			);
-			path = VC;
 			sourceTree = "<group>";
 		};
 		5E3D12776715FA0C8EBB498B /* Pods */ = {
@@ -276,18 +260,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00EB094122543E6A00404703 /* ImagePickCell.swift in Sources */,
-				00EB093F22543E6A00404703 /* TakePhotoBtn.swift in Sources */,
-				00EB094022543E6A00404703 /* CancelBtn.swift in Sources */,
+				007374F62255B22B00C3D456 /* ImagePickCell.swift in Sources */,
+				007374F52255B22B00C3D456 /* TakePhotoBtn.swift in Sources */,
 				00594AC922533B45006CA687 /* ViewController.swift in Sources */,
-				00EB094222543E6A00404703 /* AlbumsCell.swift in Sources */,
-				007374E822549CA700C3D456 /* FocusView.swift in Sources */,
-				00EB094622543E6A00404703 /* DzyImagePickerVC.swift in Sources */,
-				00EB094322543E6A00404703 /* DzyCameraVC.swift in Sources */,
+				007374F32255B22B00C3D456 /* DzyImageBrowserVC.swift in Sources */,
+				007374F42255B22B00C3D456 /* DzyAlbumsVC.swift in Sources */,
+				007374F72255B22B00C3D456 /* AlbumsCell.swift in Sources */,
 				00594AC722533B45006CA687 /* AppDelegate.swift in Sources */,
+				007374F22255B22B00C3D456 /* DzyImagePickerVC.swift in Sources */,
+				007374FA2255B22B00C3D456 /* CancelBtn.swift in Sources */,
 				00594B3C22533E0C006CA687 /* PickerManager.swift in Sources */,
-				00EB094522543E6A00404703 /* DzyAlbumsVC.swift in Sources */,
-				00EB094422543E6A00404703 /* DzyImageBrowserVC.swift in Sources */,
+				007374F82255B22B00C3D456 /* FocusView.swift in Sources */,
+				007374F92255B22B00C3D456 /* DzyCameraVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

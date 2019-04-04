@@ -124,7 +124,7 @@ public class DzyImagePickerVC: UIViewController {
     }
     
     //    MARK: - 获取所有相册
-    private func getPhotoAlbums(_ ifReload: Bool = false) {
+    public func getPhotoAlbums(_ ifReload: Bool = false) {
         //创建一个PHFetchOptions对象检索照片
         let options = PHFetchOptions()
         //通过创建时间来检索
