@@ -19,10 +19,12 @@ import UIKit
 struct PickerManager {
     
     static var `default` = PickerManager()
-    /// 高 / 宽
-    var cropScale: CGFloat = 1
     
-    var ifCrop: Bool = true
+    var type: DzyImagePickerType = .origin(.single)
+//    /// 高 / 宽
+//    var cropScale: CGFloat = 1
+//
+//    var ifCrop: Bool = true
     
     weak var delegate: DzyImagePickerVCDelegate?
     

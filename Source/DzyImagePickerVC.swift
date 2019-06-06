@@ -10,6 +10,21 @@ import UIKit
 import Photos
 import SnapKit
 
+public enum DzyImagePickerType {
+    case origin(OriginType) //原图
+    case edit(EditType)     //编辑
+    
+    public enum OriginType {
+        case single     // 单图
+        case several    // 多个
+    }
+    
+    public enum EditType {
+        case square         //正方形
+        case rect(CGFloat)  //长方形
+    }
+}
+
 public class DzyImagePickerVC: UIViewController {
     /// 代理
     public weak var delegate: DzyImagePickerVCDelegate? {
@@ -20,21 +35,12 @@ public class DzyImagePickerVC: UIViewController {
         }
     }
     
-    /// 高 / 宽
-    public var cropScale: CGFloat {
+    /// 图片选择器类型
+    public var type: DzyImagePickerType {
         set {
-            PickerManager.default.cropScale = newValue
+            PickerManager.default.type = newValue
         }get {
-            return PickerManager.default.cropScale
-        }
-    }
-    
-    /// 是否裁剪
-    public var ifCrop: Bool {
-        set {
-            PickerManager.default.ifCrop = newValue
-        }get {
-            return PickerManager.default.ifCrop
+            return PickerManager.default.type
         }
     }
     
@@ -50,6 +56,15 @@ public class DzyImagePickerVC: UIViewController {
     }
     
     private weak var collectionView: UICollectionView?
+    
+    init(_ type: DzyImagePickerType) {
+        super.init(nibName: nil, bundle: nil)
+        self.type = type
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -258,25 +273,27 @@ extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource
             return
         }
         guard let photo = photos?.object(at: indexPath.row - 1) else {return}
-        if ifCrop { // 需裁剪
-            var type: CropType = .square
-            if cropScale != 1 {
-                type = .rectangle(cropScale)
-            }
-            let vc = DzyImageBrowserVC(photo, type: type)
+        switch type {
+        case .edit(let editType):
+            let vc = DzyImageBrowserVC(photo, type: editType)
             navigationController?.pushViewController(vc, animated: true)
-        }else { // 不需裁剪
-            let option = PHImageRequestOptions()
-            option.resizeMode = .exact
-            option.deliveryMode = .highQualityFormat
-            option.isSynchronous = true
-            
-            let manager = PHImageManager.default()
-            manager.requestImage(for: photo, targetSize: CGSize(width: photo.pixelWidth, height: photo.pixelHeight), contentMode: .aspectFit, options: option) { (image, info) in
-                if let image = image {
-                    self.dismiss(animated: true, completion: nil)
-                    PickerManager.default.delegate?.imagePicker(self, getOriginImage: image)
+        case .origin(let originType):
+            switch originType {
+            case .single:
+                let option = PHImageRequestOptions()
+                option.resizeMode = .exact
+                option.deliveryMode = .highQualityFormat
+                option.isSynchronous = true
+                
+                let manager = PHImageManager.default()
+                manager.requestImage(for: photo, targetSize: CGSize(width: photo.pixelWidth, height: photo.pixelHeight), contentMode: .aspectFit, options: option) { (image, info) in
+                    if let image = image {
+                        self.dismiss(animated: true, completion: nil)
+                        PickerManager.default.delegate?.imagePicker(self, getOriginImage: image)
+                    }
                 }
+            case .several:
+                print("123")
             }
         }
     }

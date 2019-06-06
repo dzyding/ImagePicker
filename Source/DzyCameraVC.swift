@@ -268,17 +268,19 @@ class DzyCameraVC: UIViewController {
     private func saveAndNextAction(_ image: UIImage) {
         UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
         DispatchQueue.main.async {
-            let manager = PickerManager.default
-            if manager.ifCrop { // 需裁剪
-                var type: CropType = .square
-                if manager.cropScale != 1 {
-                    type = .rectangle(manager.cropScale)
+            let type = PickerManager.default.type
+            switch type {
+            case .origin(let originType):
+                switch originType {
+                case .single:
+                    self.dismiss(animated: true, completion: nil)
+                    PickerManager.default.delegate?.imagePicker(nil, getOriginImage: image)
+                case .several:
+                    print("123")
                 }
-                let vc = DzyImageBrowserVC(image, type: type)
+            case .edit(let editType):
+                let vc = DzyImageBrowserVC(image, type: editType)
                 self.navigationController?.pushViewController(vc, animated: true)
-            }else {
-                self.dismiss(animated: true, completion: nil)
-                manager.delegate?.imagePicker(nil, getOriginImage: image)
             }
         }
     }

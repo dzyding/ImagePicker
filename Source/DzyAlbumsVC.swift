@@ -83,9 +83,7 @@ public class DzyAlbumsVC: UIViewController {
     }
     
     deinit {
-        // 默认需要裁剪，正方形
-        PickerManager.default.ifCrop = true
-        PickerManager.default.cropScale = 1
+        print("销毁")
     }
 }
 
@@ -109,7 +107,7 @@ extension DzyAlbumsVC: UITableViewDelegate, UITableViewDataSource {
     
     open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let album = albums[indexPath.row]
-        let vc = DzyImagePickerVC()
+        let vc = DzyImagePickerVC(PickerManager.default.type)
         vc.album = album.keys.first
         vc.photos = album.values.first
         navigationController?.pushViewController(vc, animated: true)

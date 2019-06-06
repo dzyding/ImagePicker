@@ -17,24 +17,22 @@ class ViewController: UIViewController {
     }
     
     @IBAction func rectangleAction(_ sender: Any) {
-        let vc = DzyImagePickerVC()
-        vc.cropScale = 0.66
+        let vc = DzyImagePickerVC(.edit(.rect(0.66)))
         vc.delegate = self
         let navi = UINavigationController(rootViewController: vc)
         present(navi, animated: true, completion: nil)
     }
     
     @IBAction func squareAction(_ sender: Any) {
-        let vc = DzyImagePickerVC()
+        let vc = DzyImagePickerVC(.edit(.square))
         vc.delegate = self
         let navi = UINavigationController(rootViewController: vc)
         present(navi, animated: true, completion: nil)
     }
     
     @IBAction func originAction(_ sender: Any) {
-        let vc = DzyImagePickerVC()
+        let vc = DzyImagePickerVC(.origin(.single))
         vc.delegate = self
-        vc.ifCrop = false
         let navi = UINavigationController(rootViewController: vc)
         present(navi, animated: true, completion: nil)
     }

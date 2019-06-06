@@ -21,18 +21,13 @@ public enum CornerTag: Int {
     case RB
 }
 
-public enum CropType {
-    case square
-    case rectangle(CGFloat) // 高 : 宽
-}
-
 public class DzyImageBrowserVC: UIViewController {
     
     private var sW = UIScreen.main.bounds.size.width
     
     private var sH = UIScreen.main.bounds.size.height
     // 裁剪类型
-    let type: CropType
+    let type: DzyImagePickerType.EditType
     // 最小缩放值
     private let minSize: CGFloat = 50.0
     // iPhone 原始图片数据
@@ -63,14 +58,14 @@ public class DzyImageBrowserVC: UIViewController {
         case .square:
             let y = (sH - width) / 2.0
             return CGRect(x: x, y: y, width: width, height: width)
-        case .rectangle(let n):
+        case .rect(let n):
             let height = width * n
             let y = (sH - height) / 2.0
             return CGRect(x: x, y: y, width: width, height: height)
         }
     }()
     
-    init(_ photo: AnyObject, type: CropType = .square) {
+    init(_ photo: AnyObject, type: DzyImagePickerType.EditType = .square) {
         self.photo = photo
         self.type = type
         super.init(nibName: nil, bundle: nil)
@@ -365,7 +360,7 @@ public class DzyImageBrowserVC: UIViewController {
                             x = rectF.size.height - old.y + lb_point.y - minSize
                         }
                     }
-                case .rectangle:
+                case .rect:
                     if old.x >= old.y && old.y + x <= 0 {
                         x = -old.y
                     }else if old.x < old.y && old.x + x <= 0 {
@@ -400,7 +395,7 @@ public class DzyImageBrowserVC: UIViewController {
                             x = -(rectF.size.height + old.y - rt_point.y - minSize)
                         }
                     }
-                case .rectangle:
+                case .rect:
                     if old.x >= abs(old.y) && old.y + x >= 0 {
                         x = -old.y
                     }else if old.x < abs(old.y) && lt_point.x - x <= 0 {
@@ -439,7 +434,7 @@ public class DzyImageBrowserVC: UIViewController {
                             x = rectF.size.height + lb_point.y - old.y - minSize
                         }
                     }
-                case .rectangle:
+                case .rect:
                     if abs(old.x) >= old.y && lt_point.y + x <= 0 {
                         x = -lt_point.y
                     }else if abs(old.x) < old.y && old.x - x >= 0 {
@@ -478,7 +473,7 @@ public class DzyImageBrowserVC: UIViewController {
                             x = -(rectF.size.height + old.y - rt_point.y - minSize)
                         }
                     }
-                case .rectangle:
+                case .rect:
                     if abs(old.x) >= abs(old.y) && lb_point.y + x >= 0 {
                         x = -lb_point.y
                     }else if abs(old.x) < abs(old.y) && rt_point.x + x >= 0 {
