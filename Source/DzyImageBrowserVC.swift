@@ -273,7 +273,7 @@ public class DzyImageBrowserVC: UIViewController {
             }else if old.x >= old.y && old.y + change <= 0 {
                 return -old.y
             }else if old.y - lb_point.y + change >= tempView.frame.height - minSize {
-                return tempView.frame.width - minSize + lb_point.y - old.y
+                return tempView.frame.height - minSize + lb_point.y - old.y
             }else {
                 return change
             }
@@ -297,7 +297,7 @@ public class DzyImageBrowserVC: UIViewController {
             }else if abs(old.x) >= old.y && old.y + change <= 0 {
                 return -old.y
             }else if old.y - lb_point.y + change >= tempView.frame.height - minSize {
-                return tempView.frame.width - minSize + lb_point.y - old.y
+                return tempView.frame.height - minSize + lb_point.y - old.y
             }else {
                 return change
             }
