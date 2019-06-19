@@ -13,14 +13,16 @@ import SnapKit
 public class DzyAlbumsVC: UIViewController {
     // 所有相册
     private var albums = [[String: PHFetchResult<PHAsset>]]()
-    
-    private weak var tableView: UITableView?
 
     override public func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "全部相册"
         basicStep()
         loadAlbums()
+    }
+    
+    deinit {
+        print("销毁")
     }
     
     // 获取所有相册 
@@ -56,18 +58,11 @@ public class DzyAlbumsVC: UIViewController {
                 }
             }
         }
-        tableView?.reloadData()
+        tableView.reloadData()
     }
     
+    //    MARK: - UI
     private func basicStep() {
-        let tableView = UITableView(frame: view.bounds, style: .plain)
-        tableView.separatorStyle = .none
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.rowHeight = 60
-        view.addSubview(tableView)
-        self.tableView = tableView
-        
         tableView.register(AlbumsCell.self, forCellReuseIdentifier: "Cell")
         
         tableView.snp.makeConstraints { (make) in
@@ -82,9 +77,15 @@ public class DzyAlbumsVC: UIViewController {
         }
     }
     
-    deinit {
-        print("销毁")
-    }
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView(frame: view.bounds, style: .plain)
+        tableView.separatorStyle = .none
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.rowHeight = 60
+        view.addSubview(tableView)
+        return tableView
+    }()
 }
 
 extension DzyAlbumsVC: UITableViewDelegate, UITableViewDataSource {

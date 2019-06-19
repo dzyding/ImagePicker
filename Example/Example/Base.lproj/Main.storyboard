@@ -46,6 +46,13 @@
                                     <action selector="originAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="bm1-Rk-Rg1"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jw3-cT-Nrs">
+                                <rect key="frame" x="191.5" y="539" width="31" height="30"/>
+                                <state key="normal" title="多图"/>
+                                <connections>
+                                    <action selector="severalAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="WKK-85-cvF"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -54,9 +61,11 @@
                             <constraint firstItem="ck8-jV-qti" firstAttribute="top" secondItem="EGx-rp-0hh" secondAttribute="bottom" constant="25" id="Ghu-Ez-I7z"/>
                             <constraint firstItem="EGx-rp-0hh" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="QbR-RJ-v74"/>
                             <constraint firstItem="Qg8-hN-c3W" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="50" id="fNi-kE-SnJ"/>
+                            <constraint firstItem="Jw3-cT-Nrs" firstAttribute="top" secondItem="qU3-rO-VDR" secondAttribute="bottom" constant="25" id="hsz-X8-JJD"/>
                             <constraint firstItem="EGx-rp-0hh" firstAttribute="top" secondItem="Qg8-hN-c3W" secondAttribute="bottom" constant="30" id="sAN-9E-c5Y"/>
                             <constraint firstItem="qU3-rO-VDR" firstAttribute="top" secondItem="ck8-jV-qti" secondAttribute="bottom" constant="25" id="sBQ-nA-vhB"/>
                             <constraint firstItem="ck8-jV-qti" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="xS2-VB-g9O"/>
+                            <constraint firstItem="Jw3-cT-Nrs" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="xav-6C-HUn"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>

@@ -49,13 +49,11 @@ public class DzyImagePickerVC: UIViewController {
     
     public var album: String?
  
-    public var photos: PHFetchResult<PHAsset>? {
-        didSet {
-            caches = [UIImage?](repeating: nil, count: photos?.count ?? 0)
-        }
-    }
+    public var photos: PHFetchResult<PHAsset>?
     
     private weak var collectionView: UICollectionView?
+    
+    private var observer: Any?
     
     init(_ type: DzyImagePickerType) {
         super.init(nibName: nil, bundle: nil)
@@ -81,11 +79,36 @@ public class DzyImagePickerVC: UIViewController {
             navigationItem.title = "全部照片"
             checkAuthorization()
         }
+        
+        observer = NotificationCenter.default.addObserver(forName: Notice_SaveImage, object: nil, queue: nil, using: { [weak self] (noti) in
+            if let image = noti.userInfo?["image"] as? UIImage {
+                self?.saveImage(image)
+            }
+        })
+    }
+    
+    deinit {
+        print("销毁")
+        if let observer = observer {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
+    
+    private func saveImage(_ image: UIImage) {
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.creationRequestForAsset(from: image)
+        }) { (result, error) in
+            if result {
+                self.caches.insert(image, at: 0)
+                self.getPhotoAlbums(true, initCaches: false)
+            }
+        }
     }
     
     //    MARK: - 取消
@@ -139,7 +162,7 @@ public class DzyImagePickerVC: UIViewController {
     }
     
     //    MARK: - 获取所有相册
-    public func getPhotoAlbums(_ ifReload: Bool = false) {
+    public func getPhotoAlbums(_ ifReload: Bool = false, initCaches: Bool = true) {
         //创建一个PHFetchOptions对象检索照片
         let options = PHFetchOptions()
         //通过创建时间来检索
@@ -148,6 +171,9 @@ public class DzyImagePickerVC: UIViewController {
         options.predicate = NSPredicate(format: "mediaType in %@", [PHAssetMediaType.image.rawValue])
         //找到所有相片
         photos = PHAsset.fetchAssets(with: options)
+        if initCaches {
+            caches = [UIImage?](repeating: nil, count: photos?.count ?? 0)
+        }
         
         if ifReload {
             DispatchQueue.main.async {

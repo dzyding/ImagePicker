@@ -266,17 +266,22 @@ class DzyCameraVC: UIViewController {
     
     //    MARK: - 保存照片，并根据参数判断是否跳转到裁剪界面
     private func saveAndNextAction(_ image: UIImage) {
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
         DispatchQueue.main.async {
             let type = PickerManager.default.type
             switch type {
             case .origin(let originType):
                 switch originType {
                 case .single:
+                    UIImageWriteToSavedPhotosAlbum(
+                        image, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil
+                    )
                     self.dismiss(animated: true, completion: nil)
                     PickerManager.default.delegate?.imagePicker(nil, getOriginImage: image)
                 case .several:
-                    print("123")
+                    NotificationCenter.default.post(
+                        name: Notice_SaveImage, object: nil, userInfo: ["image" : image]
+                    )
+                    self.navigationController?.popViewController(animated: true)
                 }
             case .edit(let editType):
                 let vc = DzyImageBrowserVC(image, type: editType)

@@ -36,6 +36,13 @@ class ViewController: UIViewController {
         let navi = UINavigationController(rootViewController: vc)
         present(navi, animated: true, completion: nil)
     }
+    
+    @IBAction func severalAction(_ sender: UIButton) {
+        let vc = DzyImagePickerVC(.origin(.several))
+        vc.delegate = self
+        let navi = UINavigationController(rootViewController: vc)
+        present(navi, animated: true, completion: nil)
+    }
 }
 
 extension ViewController: DzyImagePickerVCDelegate {

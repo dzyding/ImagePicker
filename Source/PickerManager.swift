@@ -15,16 +15,15 @@ import UIKit
     func imagePicker(_ picker: DzyImagePickerVC?, getOriginImage image: UIImage)
 }
 
+// 拍完照保存图片
+let Notice_SaveImage = Notification.Name("DzySaveImage")
+
 /// 统一保存，不然几个界面间跳转的时候，需要传来传去的
 struct PickerManager {
     
     static var `default` = PickerManager()
     
     var type: DzyImagePickerType = .origin(.single)
-//    /// 高 / 宽
-//    var cropScale: CGFloat = 1
-//
-//    var ifCrop: Bool = true
     
     weak var delegate: DzyImagePickerVCDelegate?
     
