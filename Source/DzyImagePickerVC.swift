@@ -43,9 +43,10 @@ public class DzyImagePickerVC: UIViewController {
             return PickerManager.default.type
         }
     }
-    
-    /// 缓存
-    public var caches: [UIImage?] = []
+    /// 选中的数量
+    public var selectedNum: Int = 0
+    /// 缓存/选中
+    public var caches: [(UIImage?, Int)] = []
     
     public var album: String?
  
@@ -73,8 +74,9 @@ public class DzyImagePickerVC: UIViewController {
         setViewControllers()
         setCollectionView()
         
-        if let _ = photos {
+        if photos != nil {
             navigationItem.title = album
+            caches = [(UIImage?, Int)](repeating: (nil, -1), count: photos?.count ?? 0)
         }else {
             navigationItem.title = "全部照片"
             checkAuthorization()
@@ -105,7 +107,8 @@ public class DzyImagePickerVC: UIViewController {
             PHAssetChangeRequest.creationRequestForAsset(from: image)
         }) { (result, error) in
             if result {
-                self.caches.insert(image, at: 0)
+                self.selectedNum += 1
+                self.caches.insert((image, self.selectedNum), at: 0)
                 self.getPhotoAlbums(true, initCaches: false)
             }
         }
@@ -172,7 +175,7 @@ public class DzyImagePickerVC: UIViewController {
         //找到所有相片
         photos = PHAsset.fetchAssets(with: options)
         if initCaches {
-            caches = [UIImage?](repeating: nil, count: photos?.count ?? 0)
+            caches = [(UIImage?, Int)](repeating: (nil, -1), count: photos?.count ?? 0)
         }
         
         if ifReload {
@@ -185,7 +188,7 @@ public class DzyImagePickerVC: UIViewController {
     //    MARK: - 获取缩略图
     private func loadCompressionImg(_ photo: PHAsset?, item: Int) {
         guard let cell = collectionView?.cellForItem(at: IndexPath(item: item, section: 0)) as? ImagePickCell else {return}
-        if let image = caches[item - 1] {
+        if let image = caches[item - 1].0 {
             cell.imgView?.image = image
             return
         }
@@ -198,7 +201,7 @@ public class DzyImagePickerVC: UIViewController {
             let manager = PHImageManager.default()
             manager.requestImage(for: photo, targetSize: CGSize(width: 500.0, height: 500.0), contentMode: .aspectFill, options: option) { [weak self] (image, info) in
                 cell.imgView?.image = image
-                self?.caches[item - 1] = image
+                self?.caches[item - 1].0 = image
             }
         }
     }
@@ -280,14 +283,13 @@ extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource
         let cell = cell as? ImagePickCell
         cell?.imgView?.image = nil
         if indexPath.item == 0 {
-            cell?.imgView?.contentMode = .scaleAspectFit
-            cell?.imgView?.image = PickerManager.default.loadImageFromBunlde("photo")
+            cell?.camearStyle()
         }else {
             let row = indexPath.row - 1
             let photo = photos?.object(at: row)
             let cache = caches[row]
             cell?.updateViews(photo, cache: cache, complete: { [weak self] (image) in
-                self?.caches[row] = image
+                self?.caches[row].0 = image
             })
         }
     }
@@ -319,7 +321,21 @@ extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource
                     }
                 }
             case .several:
-                print("123")
+                let row = indexPath.row - 1
+                if caches[row].1 == -1 {
+                    selectedNum += 1
+                    caches[row].1 = selectedNum
+                }else {
+                    selectedNum -= 1
+                    caches[row].1 = -1
+                }
+                let photo = photos?.object(at: row)
+                let cache = caches[row]
+                if let cell = collectionView.cellForItem(at: indexPath) as? ImagePickCell {
+                    cell.updateViews(photo, cache: cache, complete: { [weak self] (image) in
+                        self?.caches[row].0 = image
+                    })
+                }
             }
         }
     }
