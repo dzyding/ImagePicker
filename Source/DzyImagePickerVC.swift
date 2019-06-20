@@ -43,10 +43,12 @@ public class DzyImagePickerVC: UIViewController {
             return PickerManager.default.type
         }
     }
-    /// 选中的数量
-    public var selectedNum: Int = 0
     /// 缓存/选中
     public var caches: [(UIImage?, Int)] = []
+    /// 选中的数量
+    public var selectedNum: Int = 0
+    /// 选中图片对应的 index (比如 sIndexs[1]，代表第二张图片对应的 index)
+    public var sIndexs = [Int](repeating: -1, count: 20)
     
     public var album: String?
  
@@ -107,11 +109,21 @@ public class DzyImagePickerVC: UIViewController {
             PHAssetChangeRequest.creationRequestForAsset(from: image)
         }) { (result, error) in
             if result {
-                self.selectedNum += 1
-                self.caches.insert((image, self.selectedNum), at: 0)
-                self.getPhotoAlbums(true, initCaches: false)
+                self.saveSuccessAction(image)
             }
         }
+    }
+    
+    private func saveSuccessAction(_ image: UIImage) {
+        (0..<sIndexs.count).forEach { (index) in
+            if sIndexs[index] != -1 {
+                sIndexs[index] += 1
+            }
+        }
+        sIndexs[selectedNum] = 1
+        selectedNum += 1
+        caches.insert((image, selectedNum), at: 0)
+        getPhotoAlbums(true, initCaches: false)
     }
     
     //    MARK: - 取消
@@ -199,7 +211,12 @@ public class DzyImagePickerVC: UIViewController {
         
         if let photo = photo {
             let manager = PHImageManager.default()
-            manager.requestImage(for: photo, targetSize: CGSize(width: 500.0, height: 500.0), contentMode: .aspectFill, options: option) { [weak self] (image, info) in
+                manager.requestImage(
+                for: photo,
+                targetSize: CGSize(width: 500.0, height: 500.0),
+                contentMode: .aspectFill,
+                options: option
+            ) { [weak self] (image, info) in
                 cell.imgView?.image = image
                 self?.caches[item - 1].0 = image
             }
@@ -276,6 +293,10 @@ extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImagePickCell", for: indexPath) as? ImagePickCell
+        if case .origin(.several) = type {
+            cell?.delegate = self
+            cell?.index = indexPath.row
+        }
         return cell!
     }
     
@@ -321,21 +342,50 @@ extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource
                     }
                 }
             case .several:
-                let row = indexPath.row - 1
-                if caches[row].1 == -1 {
-                    selectedNum += 1
-                    caches[row].1 = selectedNum
-                }else {
-                    selectedNum -= 1
-                    caches[row].1 = -1
+               print("several")
+            }
+        }
+    }
+}
+
+extension DzyImagePickerVC: ImagePickCellDelegate {
+    open func pickCell(_ pickCell: ImagePickCell, didSelectedBtn btn: UIButton) {
+        let row = pickCell.index - 1
+        func updateOne() {
+            let cache = caches[row]
+            let indexPath = IndexPath(row: pickCell.index, section: 0)
+            if let cell = collectionView?.cellForItem(at: indexPath) as? ImagePickCell {
+                cell.updateSelectedType(cache)
+            }
+        }
+        if caches[row].1 == -1 {
+            sIndexs[selectedNum] = pickCell.index
+            selectedNum += 1
+            caches[row].1 = selectedNum
+            updateOne()
+        }else {
+            // 之前选择的第几张照片
+            let old = caches[row].1
+            // 将照片对应的 index 移除（后面照片对应的 index 就会自动往前）
+            sIndexs.remove(at: old - 1)
+            // 在最后面补充一个
+            sIndexs.append(-1)
+            // 选中图片减少一
+            selectedNum -= 1
+            // 取消选中状态
+            caches[row].1 = -1
+            // 如果点击的正好是最后一张
+            if old == selectedNum + 1 {
+                updateOne()
+            }else {// 如果点击的是中间的某张
+                (old - 1..<sIndexs.count).forEach { (i) in
+                    // 获取 cache 对应的 index
+                    let index = sIndexs[i]
+                    if index != -1 {
+                        caches[index - 1].1 -= 1
+                    }
                 }
-                let photo = photos?.object(at: row)
-                let cache = caches[row]
-                if let cell = collectionView.cellForItem(at: indexPath) as? ImagePickCell {
-                    cell.updateViews(photo, cache: cache, complete: { [weak self] (image) in
-                        self?.caches[row].0 = image
-                    })
-                }
+                collectionView?.reloadData()
             }
         }
     }

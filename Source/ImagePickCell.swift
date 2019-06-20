@@ -10,20 +10,24 @@ import UIKit
 import SnapKit
 import Photos
 
-class ImagePickCell: UICollectionViewCell {
+protocol ImagePickCellDelegate: class {
+    func pickCell(_ pickCell: ImagePickCell, didSelectedBtn btn: UIButton)
+}
+
+open class ImagePickCell: UICollectionViewCell {
+    
+    weak var delegate: ImagePickCellDelegate?
     
     weak var imgView: UIImageView?
     
-    private var numLB: UILabel? {
-        return selectView.viewWithTag(9) as? UILabel
-    }
+    var index: Int = 0
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         basicStep()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -32,29 +36,49 @@ class ImagePickCell: UICollectionViewCell {
         contentView.addSubview(imgView)
         self.imgView = imgView
         
-        contentView.addSubview(selectView)
-        selectView.isHidden = true
+        contentView.addSubview(numBtn)
+        numBtn.isHidden = true
         
         imgView.snp.makeConstraints { (make) in
             make.edges.equalTo(contentView).inset(UIEdgeInsets.zero)
         }
         
-        selectView.snp.makeConstraints { (make) in
-            make.edges.equalTo(contentView).inset(UIEdgeInsets.zero)
+        numBtn.snp.makeConstraints { (make) in
+            make.top.right.equalTo(0)
+            make.width.height.equalTo(30)
         }
     }
     
+    //    MARK: - 选中
+    @objc func selectedAction(_ btn: UIButton) {
+        delegate?.pickCell(self, didSelectedBtn: btn)
+    }
+    
+    //    MARK: - 相机 cell 的样式
     public func camearStyle() {
-        selectView.isHidden = true
+        numBtn.isHidden = true
         imgView?.contentMode = .scaleAspectFit
         imgView?.image = PickerManager.default.loadImageFromBunlde("photo")
     }
     
+    //    MARK: - 更新选中状态
+    public func updateSelectedType(_ cache: (UIImage?, Int)) {
+        let type = PickerManager.default.type
+        switch type {
+        case .origin(.several):
+            let num = cache.1
+            numBtn.isHidden = false
+            numBtn.setTitle(num == -1 ? nil : "\(num)", for: .normal)
+            numBtn.isSelected = num != -1
+        default:
+            numBtn.isHidden = true
+        }
+    }
+    
+    //    MARK: - 更新视图
     public func updateViews(_ photo: PHAsset?, cache: (UIImage?, Int), complete: ((UIImage?) -> ())?) {
+        updateSelectedType(cache)
         imgView?.contentMode = .scaleToFill
-        selectView.isHidden = cache.1 == -1
-        numLB?.text = "\(cache.1)"
-        
         if let cache = cache.0 {
             imgView?.image = cache
             return
@@ -76,24 +100,21 @@ class ImagePickCell: UICollectionViewCell {
     }
     
     //    MARK: - 懒加载
-    private lazy var selectView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor.clear
-        view.layer.borderColor = UIColor.blue.cgColor
-        view.layer.borderWidth = 3
+    private lazy var numBtn: UIButton = {
+        let normalImg = PickerManager.default
+            .loadImageFromBunlde("img_selected_no")
+        let selectedImg = PickerManager.default
+            .loadImageFromBunlde("img_selected")
         
-        let numLB = UILabel()
-        numLB.textColor = .white
-        numLB.textAlignment = .center
-        numLB.backgroundColor = .blue
-        numLB.font = UIFont.systemFont(ofSize: 12)
-        numLB.tag = 9
-        view.addSubview(numLB)
-        
-        numLB.snp.makeConstraints({ (make) in
-            make.top.right.equalTo(view)
-            make.height.width.equalTo(20)
-        })
-        return view
+        let numBtn = UIButton(type: .custom)
+        numBtn.setTitleColor(.white, for: .normal)
+        numBtn.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+        numBtn.setBackgroundImage(normalImg, for: .normal)
+        numBtn.setBackgroundImage(selectedImg, for: .selected)
+        numBtn.addTarget(
+            self, action: #selector(selectedAction(_:)), for: .touchUpInside
+        )
+        numBtn.tag = 9
+        return numBtn
     }()
 }
