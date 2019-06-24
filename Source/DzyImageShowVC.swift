@@ -15,7 +15,7 @@ class DzyImageShowVC: UIViewController, CustomBackBtnProtocol {
     
     private let image: UIImage
     
-    init(_ image: UIImage) {
+    public init(_ image: UIImage) {
         self.image = image
         super.init(nibName: nil, bundle: nil)
     }

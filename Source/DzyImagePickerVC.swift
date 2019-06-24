@@ -80,7 +80,7 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
     
     private var observer: Any?
     
-    init(_ type: DzyImagePickerType) {
+    public init(_ type: DzyImagePickerType) {
         super.init(nibName: nil, bundle: nil)
         self.type = type
     }
