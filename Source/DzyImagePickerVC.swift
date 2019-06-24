@@ -236,14 +236,6 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         option.deliveryMode = .highQualityFormat
         option.isSynchronous = false
         
-        var imgs: [UIImage] = []
-        let handler: (UIImage?, [AnyHashable : Any]?) -> (Void) = { (image, _) in
-            if let image = image {
-                imgs.append(image)
-            }
-            group.leave()
-        }
-        
         let sizeHandler: (PHAsset) -> CGSize = { photo in
             let w = photo.pixelWidth
             let h = photo.pixelHeight
@@ -258,19 +250,26 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
             }
         }
         
-        for pIndex in sIndexs {
-            if pIndex == -1 {break}
-            if pIndex < photos.count {
-                let photo = photos[pIndex]
+        let indexs = sIndexs.filter({$0 != -1})
+        var imgs = [UIImage](repeating: UIImage(), count: indexs.count)
+        
+        for (index, value) in indexs.enumerated() {
+            let i = value - 1
+            if i < photos.count {
+                let photo = photos[i]
                 group.enter()
                 let manager = PHImageManager.default()
                 manager.requestImage(
                     for: photo,
                     targetSize: sizeHandler(photo),
                     contentMode: .aspectFit,
-                    options: option,
-                    resultHandler: handler
-                )
+                    options: option
+                ) { (image, _) in
+                    if let image = image {
+                        imgs[index] = image
+                    }
+                    group.leave()
+                }
             }
         }
         group.notify(queue: DispatchQueue.main) {
