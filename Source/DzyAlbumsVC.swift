@@ -22,7 +22,7 @@ public class DzyAlbumsVC: UIViewController {
     }
     
     deinit {
-        print("销毁")
+        dzy_log("销毁")
     }
     
     // 获取所有相册 

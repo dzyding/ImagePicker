@@ -15,17 +15,35 @@ public enum DzyImagePickerType {
     case edit(EditType)     //编辑
     
     public enum OriginType {
-        case single     // 单图
-        case several    // 多个
+        case single         // 单图
+        case several(Int)   // 多张(张数)
     }
     
     public enum EditType {
         case square         //正方形
         case rect(CGFloat)  //长方形
     }
+    
+    var isSeveral: Bool {
+        switch self {
+        case .origin(.several):
+            return true
+        default:
+            return false
+        }
+    }
+    
+    var maxCount: Int {
+        switch self {
+        case .origin(.several(let count)):
+            return count
+        default:
+           return 0
+        }
+    }
 }
 
-public class DzyImagePickerVC: UIViewController {
+public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
     /// 代理
     public weak var delegate: DzyImagePickerVCDelegate? {
         set {
@@ -46,7 +64,11 @@ public class DzyImagePickerVC: UIViewController {
     /// 缓存/选中
     public var caches: [(UIImage?, Int)] = []
     /// 选中的数量
-    public var selectedNum: Int = 0
+    public var selectedNum: Int = 0 {
+        didSet {
+            sureBtn.setTitle("选择(\(selectedNum))", for: .normal)
+        }
+    }
     /// 选中图片对应的 index (比如 sIndexs[1]，代表第二张图片对应的 index)
     public var sIndexs = [Int](repeating: -1, count: 20)
     
@@ -70,11 +92,12 @@ public class DzyImagePickerVC: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.isTranslucent = true
-        navigationController?.navigationBar.alpha = 0.7
+        navigationController?.navigationBar.alpha = 0.5
         
         setNaviItem()
         setViewControllers()
         setCollectionView()
+        setSureBtn()
         
         if photos != nil {
             navigationItem.title = album
@@ -84,7 +107,12 @@ public class DzyImagePickerVC: UIViewController {
             checkAuthorization()
         }
         
-        observer = NotificationCenter.default.addObserver(forName: Notice_SaveImage, object: nil, queue: nil, using: { [weak self] (noti) in
+        observer = NotificationCenter.default.addObserver(
+            forName: PickerNotice.SaveImage,
+            object: nil,
+            queue: nil,
+            using:
+        { [weak self] (noti) in
             if let image = noti.userInfo?["image"] as? UIImage {
                 self?.saveImage(image)
             }
@@ -92,7 +120,7 @@ public class DzyImagePickerVC: UIViewController {
     }
     
     deinit {
-        print("销毁")
+        dzy_log("销毁")
         if let observer = observer {
             NotificationCenter.default.removeObserver(observer)
         }
@@ -197,52 +225,84 @@ public class DzyImagePickerVC: UIViewController {
         }
     }
     
-    //    MARK: - 获取缩略图
-    private func loadCompressionImg(_ photo: PHAsset?, item: Int) {
-        guard let cell = collectionView?.cellForItem(at: IndexPath(item: item, section: 0)) as? ImagePickCell else {return}
-        if let image = caches[item - 1].0 {
-            cell.imgView?.image = image
-            return
-        }
+    //    MARK: - 多选时的确认操作
+    @objc public func severalSureAction() {
+        guard let photos = photos, photos.count > 0 else {return}
+        delegate?.selectedFinshAndBeginDownload(self)
+        let group = DispatchGroup()
+        
         let option = PHImageRequestOptions()
-        option.resizeMode = .fast
-        option.deliveryMode = .fastFormat
+        option.resizeMode = .exact
+        option.deliveryMode = .highQualityFormat
         option.isSynchronous = false
         
-        if let photo = photo {
-            let manager = PHImageManager.default()
-                manager.requestImage(
-                for: photo,
-                targetSize: CGSize(width: 500.0, height: 500.0),
-                contentMode: .aspectFill,
-                options: option
-            ) { [weak self] (image, info) in
-                cell.imgView?.image = image
-                self?.caches[item - 1].0 = image
+        var imgs: [UIImage] = []
+        let handler: (UIImage?, [AnyHashable : Any]?) -> (Void) = { (image, _) in
+            if let image = image {
+                imgs.append(image)
             }
+            group.leave()
+        }
+        
+        let sizeHandler: (PHAsset) -> CGSize = { photo in
+            let w = photo.pixelWidth
+            let h = photo.pixelHeight
+            if w <= h {
+                let height = CGFloat(min(PickerConfig.maxSize, h))
+                let width = height / CGFloat(h) * CGFloat(w)
+                return CGSize(width: width, height: height)
+            }else {
+                let width = CGFloat(min(PickerConfig.maxSize, w))
+                let height = width / CGFloat(w) * CGFloat(h)
+                return CGSize(width: width, height: height)
+            }
+        }
+        
+        for pIndex in sIndexs {
+            if pIndex == -1 {break}
+            if pIndex < photos.count {
+                let photo = photos[pIndex]
+                group.enter()
+                let manager = PHImageManager.default()
+                manager.requestImage(
+                    for: photo,
+                    targetSize: sizeHandler(photo),
+                    contentMode: .aspectFit,
+                    options: option,
+                    resultHandler: handler
+                )
+            }
+        }
+        group.notify(queue: DispatchQueue.main) {
+            self.delegate?.imagePicker(self, getImages: imgs)
+            self.dismiss(animated: true, completion: nil)
         }
     }
     
     //    MARK: - UI
     private func setNaviItem() {
-        navigationItem.hidesBackButton = true
+        customBackBtn().addTarget(
+            self,
+            action: #selector(backAction),
+            for: .touchUpInside
+        )
         
+        let x: CGFloat = 51.0/255.0
         let right = UIButton(type: .custom)
         right.setTitle("取消", for: .normal)
-        right.setTitleColor(UIColor(red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1), for: .normal)
+        right.setTitleColor(
+            UIColor(red: x, green: x, blue: x, alpha: 1),
+            for: .normal
+        )
         right.titleLabel?.font = UIFont.systemFont(ofSize: 15)
-        right.addTarget(self, action: #selector(cancelAction), for: .touchUpInside)
+        right.addTarget(
+            self,
+            action: #selector(cancelAction),
+            for: .touchUpInside
+        )
         right.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
         let rightBtn = UIBarButtonItem(customView: right)
         navigationItem.rightBarButtonItem = rightBtn
-        
-        let image = PickerManager.default.loadImageFromBunlde("back")
-        let left = UIButton(type: .custom)
-        left.setImage(image, for: .normal)
-        left.addTarget(self, action: #selector(backAction), for: .touchUpInside)
-        left.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
-        let leftBtn = UIBarButtonItem(customView: left)
-        navigationItem.leftBarButtonItem = leftBtn
     }
     
     private func setViewControllers() {
@@ -255,14 +315,8 @@ public class DzyImagePickerVC: UIViewController {
     }
     
     private func setCollectionView() {
-        let screenW = UIScreen.main.bounds.size.width
-        let x = (screenW - 6.0) / 4.0
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: x, height: x)
-        layout.minimumInteritemSpacing = 2.0
-        layout.minimumLineSpacing = 2.0
         layout.scrollDirection = .vertical
-        
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.bounces = false
         collectionView.delegate = self
@@ -271,6 +325,12 @@ public class DzyImagePickerVC: UIViewController {
         view.addSubview(collectionView)
         self.collectionView = collectionView
         collectionView.register(ImagePickCell.self, forCellWithReuseIdentifier: "ImagePickCell")
+        let kind = UICollectionView.elementKindSectionFooter
+        collectionView.register(
+            UICollectionReusableView.self,
+            forSupplementaryViewOfKind: kind,
+            withReuseIdentifier: "footer"
+        )
         
         collectionView.snp.makeConstraints { (make) in
             if #available(iOS 11.0, *) {
@@ -283,9 +343,52 @@ public class DzyImagePickerVC: UIViewController {
             make.left.right.equalTo(0)
         }
     }
+    
+    // 如果是多选，下面要多个确认的按钮
+    private func setSureBtn() {
+        if type.isSeveral {
+            view.addSubview(sureBtn)
+            
+            sureBtn.snp.makeConstraints { (make) in
+                if #available(iOS 11.0, *) {
+                    make.bottom
+                        .equalTo(view.safeAreaLayoutGuide.snp.bottom)
+                        .offset(-10)
+                } else {
+                    make.bottom
+                        .equalTo(bottomLayoutGuide.snp.top)
+                        .offset(-10)
+                }
+                make.width.equalTo(100.0)
+                make.height.equalTo(40.0)
+                make.centerX.equalTo(view)
+            }
+        }
+    }
+    
+    //    MARK: - 懒加载
+    private lazy var sureBtn: UIButton = {
+        let btn = UIButton(type: .custom)
+        btn.backgroundColor = PickerConfig.MainColor
+        btn.setTitle("选择(0)", for: .normal)
+        btn.addTarget(
+            self,
+            action: #selector(severalSureAction),
+            for: .touchUpInside
+        )
+        btn.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+        btn.setTitleColor(.white, for: .normal)
+        btn.layer.cornerRadius = 20.0
+        btn.layer.masksToBounds = true
+        return btn
+    }()
 }
 
-extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource {
+extension DzyImagePickerVC:
+    UICollectionViewDelegate,
+    UICollectionViewDataSource,
+    UICollectionViewDelegateFlowLayout
+{
     
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return (photos?.count ?? 0) + 1
@@ -317,6 +420,9 @@ extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource
     
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.item == 0 { // 相机
+            if type.isSeveral && selectedNum >= type.maxCount {
+                return
+            }
             let vc = DzyCameraVC()
             navigationController?.pushViewController(vc, animated: true)
             return
@@ -327,24 +433,75 @@ extension DzyImagePickerVC: UICollectionViewDelegate, UICollectionViewDataSource
             let vc = DzyImageBrowserVC(photo, type: editType)
             navigationController?.pushViewController(vc, animated: true)
         case .origin(let originType):
-            switch originType {
-            case .single:
-                let option = PHImageRequestOptions()
-                option.resizeMode = .exact
-                option.deliveryMode = .highQualityFormat
-                option.isSynchronous = true
-                
-                let manager = PHImageManager.default()
-                manager.requestImage(for: photo, targetSize: CGSize(width: photo.pixelWidth, height: photo.pixelHeight), contentMode: .aspectFit, options: option) { (image, info) in
-                    if let image = image {
+            let option = PHImageRequestOptions()
+            option.resizeMode = .exact
+            option.deliveryMode = .highQualityFormat
+            option.isSynchronous = true
+            
+            let handler: (UIImage?, [AnyHashable : Any]?) -> (Void) = { [unowned self] (image, _) in
+                if let image = image {
+                    switch originType {
+                    case .single:
                         self.dismiss(animated: true, completion: nil)
                         PickerManager.default.delegate?.imagePicker(self, getOriginImage: image)
+                    case .several:
+                        let vc = DzyImageShowVC(image)
+                        self.navigationController?.pushViewController(vc, animated: true)
                     }
                 }
-            case .several:
-               print("several")
             }
+            let manager = PHImageManager.default()
+            manager.requestImage(for: photo, targetSize: CGSize(width: photo.pixelWidth, height: photo.pixelHeight), contentMode: .aspectFit, options: option, resultHandler: handler)
         }
+    }
+    
+    open func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        let screenW = UIScreen.main.bounds.size.width
+        let x = (screenW - 6.0) / 4.0
+        return CGSize(width: x, height: x)
+    }
+    
+    open func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumLineSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        return 2.0
+    }
+    
+    open func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumInteritemSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        return 2.0
+    }
+    
+    open func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForFooterInSection section: Int
+    ) -> CGSize {
+        let width = UIScreen.main.bounds.size.width
+        return type.isSeveral ? CGSize(width: width, height: 60.0) : .zero
+    }
+    
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        let footer = collectionView.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: "footer",
+            for: indexPath
+        )
+        footer.backgroundColor = .white
+        return footer
     }
 }
 
@@ -358,12 +515,15 @@ extension DzyImagePickerVC: ImagePickCellDelegate {
                 cell.updateSelectedType(cache)
             }
         }
-        if caches[row].1 == -1 {
+        if caches[row].1 == -1 { // 选中
+            if selectedNum >= type.maxCount {
+                return
+            }
             sIndexs[selectedNum] = pickCell.index
             selectedNum += 1
             caches[row].1 = selectedNum
             updateOne()
-        }else {
+        }else { // 取消选中
             // 之前选择的第几张照片
             let old = caches[row].1
             // 将照片对应的 index 移除（后面照片对应的 index 就会自动往前）

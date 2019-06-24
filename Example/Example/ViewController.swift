@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    @IBOutlet weak var imgView: UIImageView!
+    @IBOutlet weak var stackView: UIStackView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,21 +38,46 @@ class ViewController: UIViewController {
     }
     
     @IBAction func severalAction(_ sender: UIButton) {
-        let vc = DzyImagePickerVC(.origin(.several))
+        let vc = DzyImagePickerVC(.origin(.several(9)))
         vc.delegate = self
         let navi = UINavigationController(rootViewController: vc)
         present(navi, animated: true, completion: nil)
+    }
+    
+    private func addImgs(_ images: [UIImage]) {
+        DispatchQueue.main.async {
+            (0..<self.stackView.arrangedSubviews.count).forEach { (_) in
+                self.stackView.arrangedSubviews.first?.removeFromSuperview()
+            }
+            images.forEach { (image) in
+                let imgView = UIImageView(image: image)
+                imgView.layer.masksToBounds = true
+                imgView.contentMode = .scaleAspectFit
+                imgView.snp.makeConstraints({ (make) in
+                    make.width.equalTo(250)
+                })
+                self.stackView.addArrangedSubview(imgView)
+            }
+        }
     }
 }
 
 extension ViewController: DzyImagePickerVCDelegate {
     
     func imagePicker(_ picker: DzyImagePickerVC?, getCropImage image: UIImage) {
-        imgView.image = image
+        addImgs([image])
     }
     
     func imagePicker(_ picker: DzyImagePickerVC?, getOriginImage image: UIImage) {
-        imgView.image = image
+        addImgs([image])
     }
     
+    func selectedFinshAndBeginDownload(_ picker: DzyImagePickerVC?) {
+        print("开始")
+    }
+    
+    func imagePicker(_ picker: DzyImagePickerVC?, getImages imgs: [UIImage]) {
+        print("结束")
+        addImgs(imgs)
+    }
 }

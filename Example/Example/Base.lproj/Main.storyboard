@@ -18,13 +18,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Qg8-hN-c3W">
-                                <rect key="frame" x="82" y="94" width="250" height="250"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="250" id="KXF-3e-F7Z"/>
-                                    <constraint firstAttribute="height" constant="250" id="ymF-tU-rLn"/>
-                                </constraints>
-                            </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EGx-rp-0hh">
                                 <rect key="frame" x="184" y="374" width="46" height="30"/>
                                 <state key="normal" title="长方形"/>
@@ -53,16 +46,33 @@
                                     <action selector="severalAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="WKK-85-cvF"/>
                                 </connections>
                             </button>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Akw-bt-zPF">
+                                <rect key="frame" x="10" y="94" width="394" height="250"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="394" placeholderIntrinsicHeight="110" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="ELp-5a-6jy">
+                                        <rect key="frame" x="0.0" y="0.0" width="394" height="250"/>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="ELp-5a-6jy" firstAttribute="top" secondItem="Akw-bt-zPF" secondAttribute="top" id="4hS-4q-vub"/>
+                                    <constraint firstItem="ELp-5a-6jy" firstAttribute="height" secondItem="Akw-bt-zPF" secondAttribute="height" id="JZH-23-VVr"/>
+                                    <constraint firstAttribute="trailing" secondItem="ELp-5a-6jy" secondAttribute="trailing" id="WCe-uF-kGh"/>
+                                    <constraint firstAttribute="height" constant="250" id="eH2-v7-ktb"/>
+                                    <constraint firstItem="ELp-5a-6jy" firstAttribute="leading" secondItem="Akw-bt-zPF" secondAttribute="leading" id="fIn-2J-5MX"/>
+                                    <constraint firstAttribute="bottom" secondItem="ELp-5a-6jy" secondAttribute="bottom" id="xc4-pv-QrR"/>
+                                </constraints>
+                            </scrollView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="Qg8-hN-c3W" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="6S9-dr-c5Z"/>
+                            <constraint firstItem="EGx-rp-0hh" firstAttribute="top" secondItem="Akw-bt-zPF" secondAttribute="bottom" constant="30" id="BXK-LQ-GMY"/>
                             <constraint firstItem="qU3-rO-VDR" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="F7V-Wp-4Vc"/>
+                            <constraint firstItem="Akw-bt-zPF" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="50" id="F8r-51-Bqu"/>
                             <constraint firstItem="ck8-jV-qti" firstAttribute="top" secondItem="EGx-rp-0hh" secondAttribute="bottom" constant="25" id="Ghu-Ez-I7z"/>
                             <constraint firstItem="EGx-rp-0hh" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="QbR-RJ-v74"/>
-                            <constraint firstItem="Qg8-hN-c3W" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="50" id="fNi-kE-SnJ"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Akw-bt-zPF" secondAttribute="trailing" constant="10" id="hld-KW-EYR"/>
                             <constraint firstItem="Jw3-cT-Nrs" firstAttribute="top" secondItem="qU3-rO-VDR" secondAttribute="bottom" constant="25" id="hsz-X8-JJD"/>
-                            <constraint firstItem="EGx-rp-0hh" firstAttribute="top" secondItem="Qg8-hN-c3W" secondAttribute="bottom" constant="30" id="sAN-9E-c5Y"/>
+                            <constraint firstItem="Akw-bt-zPF" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="jGv-61-mQE"/>
                             <constraint firstItem="qU3-rO-VDR" firstAttribute="top" secondItem="ck8-jV-qti" secondAttribute="bottom" constant="25" id="sBQ-nA-vhB"/>
                             <constraint firstItem="ck8-jV-qti" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="xS2-VB-g9O"/>
                             <constraint firstItem="Jw3-cT-Nrs" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="xav-6C-HUn"/>
@@ -70,11 +80,12 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
-                        <outlet property="imgView" destination="Qg8-hN-c3W" id="N9J-69-0dv"/>
+                        <outlet property="stackView" destination="ELp-5a-6jy" id="D29-uU-jmb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="10" y="86"/>
         </scene>
     </scenes>
 </document>

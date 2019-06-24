@@ -23,6 +23,8 @@
 		007374F82255B22B00C3D456 /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374EF2255B22B00C3D456 /* FocusView.swift */; };
 		007374F92255B22B00C3D456 /* DzyCameraVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374F02255B22B00C3D456 /* DzyCameraVC.swift */; };
 		007374FA2255B22B00C3D456 /* CancelBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374F12255B22B00C3D456 /* CancelBtn.swift */; };
+		00B427AD22C058FF00C6C428 /* DzyImageShowVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B427AC22C058FF00C6C428 /* DzyImageShowVC.swift */; };
+		00B427AF22C0610000C6C428 /* CustomBackBtnProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B427AE22C0610000C6C428 /* CustomBackBtnProtocol.swift */; };
 		8E9EA93292D1A42CBE52CD17 /* Pods_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2937F5BB67B2F35D2D4BA72A /* Pods_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +47,8 @@
 		007374EF2255B22B00C3D456 /* FocusView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		007374F02255B22B00C3D456 /* DzyCameraVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DzyCameraVC.swift; sourceTree = "<group>"; };
 		007374F12255B22B00C3D456 /* CancelBtn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CancelBtn.swift; sourceTree = "<group>"; };
+		00B427AC22C058FF00C6C428 /* DzyImageShowVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DzyImageShowVC.swift; sourceTree = "<group>"; };
+		00B427AE22C0610000C6C428 /* CustomBackBtnProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackBtnProtocol.swift; sourceTree = "<group>"; };
 		11232D161F68188D67BE3DE2 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		2937F5BB67B2F35D2D4BA72A /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6C3FE6ADC9E41ECC951E35E /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -102,12 +106,14 @@
 				007374EB2255B22B00C3D456 /* DzyAlbumsVC.swift */,
 				007374E92255B22B00C3D456 /* DzyImagePickerVC.swift */,
 				007374EA2255B22B00C3D456 /* DzyImageBrowserVC.swift */,
+				00B427AC22C058FF00C6C428 /* DzyImageShowVC.swift */,
 				007374F02255B22B00C3D456 /* DzyCameraVC.swift */,
 				007374EE2255B22B00C3D456 /* AlbumsCell.swift */,
 				007374ED2255B22B00C3D456 /* ImagePickCell.swift */,
 				007374EF2255B22B00C3D456 /* FocusView.swift */,
 				007374F12255B22B00C3D456 /* CancelBtn.swift */,
 				007374EC2255B22B00C3D456 /* TakePhotoBtn.swift */,
+				00B427AE22C0610000C6C428 /* CustomBackBtnProtocol.swift */,
 			);
 			name = Source;
 			path = ../../Source;
@@ -260,11 +266,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00B427AD22C058FF00C6C428 /* DzyImageShowVC.swift in Sources */,
 				007374F62255B22B00C3D456 /* ImagePickCell.swift in Sources */,
 				007374F52255B22B00C3D456 /* TakePhotoBtn.swift in Sources */,
 				00594AC922533B45006CA687 /* ViewController.swift in Sources */,
 				007374F32255B22B00C3D456 /* DzyImageBrowserVC.swift in Sources */,
 				007374F42255B22B00C3D456 /* DzyAlbumsVC.swift in Sources */,
+				00B427AF22C0610000C6C428 /* CustomBackBtnProtocol.swift in Sources */,
 				007374F72255B22B00C3D456 /* AlbumsCell.swift in Sources */,
 				00594AC722533B45006CA687 /* AppDelegate.swift in Sources */,
 				007374F22255B22B00C3D456 /* DzyImagePickerVC.swift in Sources */,

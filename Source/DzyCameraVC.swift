@@ -279,7 +279,9 @@ class DzyCameraVC: UIViewController {
                     PickerManager.default.delegate?.imagePicker(nil, getOriginImage: image)
                 case .several:
                     NotificationCenter.default.post(
-                        name: Notice_SaveImage, object: nil, userInfo: ["image" : image]
+                        name: PickerNotice.SaveImage,
+                        object: nil,
+                        userInfo: ["image" : image]
                     )
                     self.navigationController?.popViewController(animated: true)
                 }
