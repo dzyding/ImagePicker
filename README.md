@@ -1,3 +1,9 @@
+## 简介
+仿微信裁剪头像功能，多图选择
+
+## 待开发功能
+优化内存
+
 ## 导入方式
 
 ```
@@ -9,8 +15,7 @@ pod 'DzyImagePicker'
 正方形：  
 
 ```swift
-// 默认正方形、需要裁剪  所以可以不进行参数的赋值
-let vc = DzyImagePickerVC()
+let vc = DzyImagePickerVC(.edit(.square))
 vc.delegate = self
 let navi = UINavigationController(rootViewController: vc)
 present(navi, animated: true, completion: nil)
@@ -22,9 +27,7 @@ present(navi, animated: true, completion: nil)
 长方形:  
 
 ```swift
-let vc = DzyImagePickerVC()
-// 0.66 = 宽 / 高
-vc.cropScale = 0.66
+let vc = DzyImagePickerVC(.edit(.rect(0.66)))
 vc.delegate = self
 let navi = UINavigationController(rootViewController: vc)
 present(navi, animated: true, completion: nil)
@@ -36,9 +39,17 @@ present(navi, animated: true, completion: nil)
 原图:  
 
 ```swift
-let vc = DzyImagePickerVC()
+let vc = DzyImagePickerVC(.origin(.single))
 vc.delegate = self
-vc.ifCrop = false
+let navi = UINavigationController(rootViewController: vc)
+present(navi, animated: true, completion: nil)
+```
+
+多张原图:
+
+```swift
+let vc = DzyImagePickerVC(.origin(.several(9)))
+vc.delegate = self
 let navi = UINavigationController(rootViewController: vc)
 present(navi, animated: true, completion: nil)
 ```
@@ -46,11 +57,23 @@ present(navi, animated: true, completion: nil)
 ## 获取结果
 
 ```swift
+// 裁剪过的单图
 func imagePicker(_ picker: DzyImagePickerVC?, getCropImage image: UIImage) {
-    imgView.image = image
+
 }
 
+// 原图
 func imagePicker(_ picker: DzyImagePickerVC?, getOriginImage image: UIImage) {
-    imgView.image = image
+
+}
+
+// 多图，选择完毕
+func selectedFinshAndBeginDownload(_ picker: DzyImagePickerVC?) {
+
+}
+
+// 多图，获取结果
+func imagePicker(_ picker: DzyImagePickerVC?, getImages imgs: [UIImage]) {
+    
 }
 ```
