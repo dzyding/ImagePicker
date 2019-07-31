@@ -81,7 +81,11 @@ class DzyCameraVC: UIViewController {
     }
     
     //    MARK: - 拍照
-    @objc open func takePhotoAction() {
+    @objc open func takePhotoAction(_ btn: UIButton) {
+        btn.isUserInteractionEnabled = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            btn.isUserInteractionEnabled = true
+        }
         if #available(iOS 10.0, *) {
             if let output = output as? AVCapturePhotoOutput {
                 let settings: AVCapturePhotoSettings = {
@@ -302,7 +306,7 @@ class DzyCameraVC: UIViewController {
         view.addGestureRecognizer(pan)
         
         let takePhotoBtn = TakePhotoBtn(type: .custom)
-        takePhotoBtn.addTarget(self, action: #selector(takePhotoAction), for: .touchUpInside)
+        takePhotoBtn.addTarget(self, action: #selector(takePhotoAction(_:)), for: .touchUpInside)
         view.addSubview(takePhotoBtn)
         
         let cancelBtn = CancelBtn(type: .custom)

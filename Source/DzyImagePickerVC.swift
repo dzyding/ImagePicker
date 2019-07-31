@@ -66,7 +66,11 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
     /// 选中的数量
     public var selectedNum: Int = 0 {
         didSet {
-            sureBtn.setTitle("选择(\(selectedNum))", for: .normal)
+            DispatchQueue.main.async {
+                self.sureBtn.setTitle(
+                    "选择(\(self.selectedNum))", for: .normal
+                )
+            }
         }
     }
     /// 选中图片对应的 index (比如 sIndexs[1]，代表第二张图片对应的 index)
@@ -91,9 +95,6 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.navigationBar.isTranslucent = true
-        navigationController?.navigationBar.alpha = 0.5
-        
         setNaviItem()
         setViewControllers()
         setCollectionView()
@@ -101,7 +102,9 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         
         if photos != nil {
             navigationItem.title = album
-            caches = [(UIImage?, Int)](repeating: (nil, -1), count: photos?.count ?? 0)
+            caches = [(UIImage?, Int)](
+                repeating: (nil, -1), count: photos?.count ?? 0
+            )
         }else {
             navigationItem.title = "全部照片"
             checkAuthorization()
@@ -424,6 +427,11 @@ extension DzyImagePickerVC:
             }
             let vc = DzyCameraVC()
             navigationController?.pushViewController(vc, animated: true)
+            // 防止点相机的同时点了一张别的图，会卡住
+            collectionView.isUserInteractionEnabled = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                collectionView.isUserInteractionEnabled = true
+            }
             return
         }
         guard let photo = photos?.object(at: indexPath.row - 1) else {return}
