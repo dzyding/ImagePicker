@@ -20,18 +20,6 @@ public protocol DzyImagePickerVCDelegate: class {
     func imagePicker(_ picker: DzyImagePickerVC?, getImages imgs: [UIImage])
 }
 
-extension DzyImagePickerVCDelegate {
-    /// 裁剪过的
-    func imagePicker(_ picker: DzyImagePickerVC?, getCropImage image: UIImage) {}
-    /// 原始图片
-    func imagePicker(_ picker: DzyImagePickerVC?, getOriginImage image: UIImage) {}
-    
-    /// 多张图片选择完毕，开始加载
-    func selectedFinshAndBeginDownload(_ picker: DzyImagePickerVC?) {}
-    /// 获取多张图片
-    func imagePicker(_ picker: DzyImagePickerVC?, getImages imgs: [UIImage]) {}
-}
-
 struct PickerConfig {
     static let MainColor = UIColor(
         red: 253.0/255.0, green: 126.0/255.0, blue: 37.0/255.0, alpha: 1
@@ -47,6 +35,8 @@ public struct PickerNotice {
 
 /// 统一保存，不然几个界面间跳转的时候，需要传来传去的
 struct PickerManager {
+    /// 缩略图
+    static var smallSize = CGSize(width: 500.0, height: 500.0)
     
     static var `default` = PickerManager()
     

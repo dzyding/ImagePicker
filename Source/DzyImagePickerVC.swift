@@ -61,8 +61,10 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
             return PickerManager.default.type
         }
     }
-    /// 缓存/选中
-    public var caches: [(UIImage?, Int)] = []
+    /// 选中状态 没张图片对应的被选中的顺序，未选中就是 -1
+    public var select: [Int] = []
+    /// 缓存
+    public var caches = NSCache<NSString, UIImage>()
     /// 选中的数量
     public var selectedNum: Int = 0 {
         didSet {
@@ -100,11 +102,9 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         setCollectionView()
         setSureBtn()
         
-        if photos != nil {
+        if let photos = photos {
             navigationItem.title = album
-            caches = [(UIImage?, Int)](
-                repeating: (nil, -1), count: photos?.count ?? 0
-            )
+            select = [Int](repeating: -1, count: photos.count)
         }else {
             navigationItem.title = "全部照片"
             checkAuthorization()
@@ -136,16 +136,22 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
     
     
     private func saveImage(_ image: UIImage) {
+        guard let imageData = image.pngData() else {return}
+        var identifier: String = ""
         PHPhotoLibrary.shared().performChanges({
-            PHAssetChangeRequest.creationRequestForAsset(from: image)
+            let request = PHAssetCreationRequest.forAsset()
+            request.addResource(with: .photo, data: imageData, options: nil)
+            if let idf = request.placeholderForCreatedAsset?.localIdentifier {
+                identifier = idf
+            }
         }) { (result, error) in
             if result {
-                self.saveSuccessAction(image)
+                self.saveSuccessAction(image, identifier: identifier)
             }
         }
     }
     
-    private func saveSuccessAction(_ image: UIImage) {
+    private func saveSuccessAction(_ image: UIImage, identifier: String) {
         (0..<sIndexs.count).forEach { (index) in
             if sIndexs[index] != -1 {
                 sIndexs[index] += 1
@@ -153,7 +159,8 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         }
         sIndexs[selectedNum] = 1
         selectedNum += 1
-        caches.insert((image, selectedNum), at: 0)
+        caches.setObject(image, forKey: NSString(string: identifier))
+        select.insert(selectedNum, at: 0)
         getPhotoAlbums(true, initCaches: false)
     }
     
@@ -218,7 +225,7 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         //找到所有相片
         photos = PHAsset.fetchAssets(with: options)
         if initCaches {
-            caches = [(UIImage?, Int)](repeating: (nil, -1), count: photos?.count ?? 0)
+            select = [Int](repeating: -1, count: photos?.count ?? 0)
         }
         
         if ifReload {
@@ -413,9 +420,12 @@ extension DzyImagePickerVC:
         }else {
             let row = indexPath.row - 1
             let photo = photos?.object(at: row)
-            let cache = caches[row]
-            cell?.updateViews(photo, cache: cache, complete: { [weak self] (image) in
-                self?.caches[row].0 = image
+            let idf = NSString(string: photo?.localIdentifier ?? "")
+            let cache = caches.object(forKey: NSString(string: idf))
+            cell?.updateViews(photo, cache: cache, selectNum: select[row], complete: { [weak self] (image) in
+                if let image = image {
+                    self?.caches.setObject(image, forKey: idf)
+                }
             })
         }
     }
@@ -516,23 +526,23 @@ extension DzyImagePickerVC: ImagePickCellDelegate {
     open func pickCell(_ pickCell: ImagePickCell, didSelectedBtn btn: UIButton) {
         let row = pickCell.index - 1
         func updateOne() {
-            let cache = caches[row]
+            let selectNum = select[row] // caches[row]
             let indexPath = IndexPath(row: pickCell.index, section: 0)
             if let cell = collectionView?.cellForItem(at: indexPath) as? ImagePickCell {
-                cell.updateSelectedType(cache)
+                cell.updateSelectedType(selectNum)
             }
         }
-        if caches[row].1 == -1 { // 选中
+        if select[row] == -1 { // 选中
             if selectedNum >= type.maxCount {
                 return
             }
             sIndexs[selectedNum] = pickCell.index
             selectedNum += 1
-            caches[row].1 = selectedNum
+            select[row] = selectedNum
             updateOne()
         }else { // 取消选中
             // 之前选择的第几张照片
-            let old = caches[row].1
+            let old = select[row]
             // 将照片对应的 index 移除（后面照片对应的 index 就会自动往前）
             sIndexs.remove(at: old - 1)
             // 在最后面补充一个
@@ -540,7 +550,7 @@ extension DzyImagePickerVC: ImagePickCellDelegate {
             // 选中图片减少一
             selectedNum -= 1
             // 取消选中状态
-            caches[row].1 = -1
+            select[row] = -1
             // 如果点击的正好是最后一张
             if old == selectedNum + 1 {
                 updateOne()
@@ -549,7 +559,7 @@ extension DzyImagePickerVC: ImagePickCellDelegate {
                     // 获取 cache 对应的 index
                     let index = sIndexs[i]
                     if index != -1 {
-                        caches[index - 1].1 -= 1
+                        select[index - 1] -= 1
                     }
                 }
                 collectionView?.reloadData()

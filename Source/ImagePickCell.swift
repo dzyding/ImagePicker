@@ -20,6 +20,8 @@ open class ImagePickCell: UICollectionViewCell {
     
     weak var imgView: UIImageView?
     
+    var idf: String?
+    
     var index: Int = 0
     
     override init(frame: CGRect) {
@@ -62,11 +64,11 @@ open class ImagePickCell: UICollectionViewCell {
     }
     
     //    MARK: - 更新选中状态
-    public func updateSelectedType(_ cache: (UIImage?, Int)) {
+    public func updateSelectedType(_ selectNum: Int) {
         let type = PickerManager.default.type
         switch type {
         case .origin(.several):
-            let num = cache.1
+            let num = selectNum
             numBtn.isHidden = false
             numBtn.setTitle(num == -1 ? nil : "\(num)", for: .normal)
             numBtn.isSelected = num != -1
@@ -76,10 +78,11 @@ open class ImagePickCell: UICollectionViewCell {
     }
     
     //    MARK: - 更新视图
-    public func updateViews(_ photo: PHAsset?, cache: (UIImage?, Int), complete: ((UIImage?) -> ())?) {
-        updateSelectedType(cache)
+    public func updateViews(_ photo: PHAsset?, cache: UIImage?, selectNum: Int, complete: ((UIImage?) -> ())?) {
+        updateSelectedType(selectNum)
         imgView?.contentMode = .scaleToFill
-        if let cache = cache.0 {
+        idf = photo?.localIdentifier
+        if let cache = cache {
             imgView?.image = cache
             return
         }
@@ -88,12 +91,13 @@ open class ImagePickCell: UICollectionViewCell {
         option.deliveryMode = .highQualityFormat
         option.isSynchronous = false
         
-        if let photo = photo {
-            let manager = PHImageManager.default()
-            manager.requestImage(for: photo, targetSize: CGSize(width: 500.0, height: 500.0), contentMode: .aspectFill, options: option) { (image, info) in
-                DispatchQueue.main.async {
+        guard let photo = photo else {return}
+        let manager = PHImageManager.default()
+        manager.requestImage(for: photo, targetSize: PickerManager.smallSize, contentMode: .aspectFill, options: option) { (image, info) in
+            complete?(image)
+            DispatchQueue.main.async {
+                if self.idf == photo.localIdentifier {
                     self.imgView?.image = image
-                    complete?(image)
                 }
             }
         }
