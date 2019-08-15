@@ -86,14 +86,11 @@ open class ImagePickCell: UICollectionViewCell {
             imgView?.image = cache
             return
         }
-        let option = PHImageRequestOptions()
-        option.resizeMode = .exact
-        option.deliveryMode = .highQualityFormat
-        option.isSynchronous = false
-        
+
         guard let photo = photo else {return}
         let manager = PHImageManager.default()
-        manager.requestImage(for: photo, targetSize: PickerManager.smallSize, contentMode: .aspectFill, options: option) { (image, info) in
+        manager.requestImage(for: photo, targetSize: PickerConfig.smallSize, contentMode: .aspectFill, options: PickerConfig.asynOption)
+        { (image, info) in
             complete?(image)
             DispatchQueue.main.async {
                 if self.idf == photo.localIdentifier {

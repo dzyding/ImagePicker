@@ -65,6 +65,10 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
     public var select: [Int] = []
     /// 缓存
     public var caches = NSCache<NSString, UIImage>()
+    /// apple 缓存策略
+    public var cacheManager = PHCachingImageManager()
+    /// 上一次瑜加载的区域
+    public var previousPreheatRect = CGRect.zero
     /// 选中的数量
     public var selectedNum: Int = 0 {
         didSet {
@@ -101,6 +105,7 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         setViewControllers()
         setCollectionView()
         setSureBtn()
+        cacheManager.stopCachingImagesForAllAssets()
         
         if let photos = photos {
             navigationItem.title = album
@@ -132,6 +137,11 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        updateCachedAssets()
     }
     
     
@@ -240,12 +250,6 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         guard let photos = photos, photos.count > 0 else {return}
         delegate?.selectedFinshAndBeginDownload(self)
         let group = DispatchGroup()
-        
-        let option = PHImageRequestOptions()
-        option.resizeMode = .exact
-        option.deliveryMode = .highQualityFormat
-        option.isSynchronous = false
-        
         let sizeHandler: (PHAsset) -> CGSize = { photo in
             let w = photo.pixelWidth
             let h = photo.pixelHeight
@@ -273,7 +277,7 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
                     for: photo,
                     targetSize: sizeHandler(photo),
                     contentMode: .aspectFit,
-                    options: option
+                    options: PickerConfig.asynOption
                 ) { (image, _) in
                     if let image = image {
                         imgs[index] = image
@@ -286,6 +290,118 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
             self.delegate?.imagePicker(self, getImages: imgs)
             self.dismiss(animated: true, completion: nil)
         }
+    }
+    
+    //    MARK: - 刷新缓存过的项目
+    func updateCachedAssets() {
+        guard let collectionView = collectionView else {return}
+        if !isViewLoaded || view.window == nil {return}
+        // 预热区域 preheatRect 是 可见区域 visibleRect 的两倍高
+        let visibleRect = CGRect(
+            x: 0,
+            y: collectionView.contentOffset.y,
+            width: collectionView.bounds.size.width,
+            height: collectionView.bounds.size.height
+        )
+        let preheatRect = visibleRect.insetBy(
+            dx: 0, dy: -0.5 * visibleRect.size.height
+        )
+        // 只有当可见区域与最后一个预热区域显著不同时才更新
+        let delta = abs(preheatRect.midY - previousPreheatRect.midY)
+        if delta > view.bounds.size.height / 3.0 {
+            computeDifference(previousPreheatRect, and: preheatRect, removeHandler: { (removedRect) in
+                self.imageManagerStopCachingImages(removedRect)
+            }) { (addedRect) in
+                self.imageManagerStartCachingImages(addedRect)
+            }
+            previousPreheatRect = preheatRect
+        }
+    }
+    
+    //    MARK: - 计算缓存区域
+    func computeDifference(_ oldRect: CGRect, and newRect: CGRect, removeHandler: (CGRect) -> (), addHandler: (CGRect) -> ())
+    {
+        if newRect.intersects(oldRect) {
+            let oldMaxY = oldRect.maxY
+            let oldMinY = oldRect.minY
+            let newMaxY = newRect.maxY
+            let newMinY = newRect.minY
+            //添加 向下滑动时 newRect 除去与 oldRect 相交部分的区域（即：屏幕外底部的预热区域）
+            if (newMaxY > oldMaxY) {
+                let rectToAdd = CGRect(
+                    x: newRect.origin.x,
+                    y: oldMaxY,
+                    width: newRect.size.width,
+                    height: (newMaxY - oldMaxY)
+                )
+                addHandler(rectToAdd)
+            }
+            //添加 向上滑动时 newRect 除去与 oldRect 相交部分的区域（即：屏幕外顶部的预热区域）
+            if (oldMinY > newMinY) {
+                let rectToAdd = CGRect(
+                    x: newRect.origin.x,
+                    y: newMinY,
+                    width: newRect.size.width,
+                    height: (oldMinY - newMinY)
+                )
+                addHandler(rectToAdd)
+            }
+            //移除 向上滑动时 oldRect 除去与 newRect 相交部分的区域（即：屏幕外底部的预热区域）
+            if (newMaxY < oldMaxY) {
+                let rectToRemove = CGRect(
+                    x: newRect.origin.x,
+                    y: newMaxY,
+                    width: newRect.size.width,
+                    height: (oldMaxY - newMaxY)
+                )
+                removeHandler(rectToRemove)
+            }
+            //移除 向下滑动时 oldRect 除去与 newRect 相交部分的区域（即：屏幕外顶部的预热区域）
+            if (oldMinY < newMinY) {
+                let rectToRemove = CGRect(x: newRect.origin.x, y: oldMinY, width: newRect.size.width, height: (newMinY - oldMinY))
+                removeHandler(rectToRemove)
+            }
+        }else {
+            addHandler(newRect)
+            removeHandler(oldRect)
+        }
+    }
+    
+    //    MARK: - 开始缓存，移除缓存
+    func indexPathsForElements(_ rect: CGRect) -> [PHAsset] {
+        guard let collectionView = collectionView,
+            let fetchResult = photos
+        else {return []}
+        return collectionView.collectionViewLayout
+            .layoutAttributesForElements(in: rect)?
+            .compactMap({ (layout) -> PHAsset? in
+                let indexPath = layout.indexPath
+                if indexPath.item == 0 {
+                    return nil
+                }else {
+                    return fetchResult.object(at: indexPath.item - 1)
+                }
+            }) ?? []
+    }
+    
+    func imageManagerStartCachingImages(_ rect: CGRect) {
+        let addAssets = indexPathsForElements(rect)
+        cacheManager.startCachingImages(
+            for: addAssets,
+            targetSize: PickerConfig.smallSize,
+            contentMode: .aspectFill,
+            options: PickerConfig.asynOption
+        )
+    }
+    
+    func imageManagerStopCachingImages(_ rect: CGRect) {
+        let removeAssets = indexPathsForElements(rect)
+        cacheManager.stopCachingImages(
+            for: removeAssets,
+            targetSize: PickerConfig.smallSize,
+            contentMode: .aspectFill,
+            options: PickerConfig.asynOption
+        )
     }
     
     //    MARK: - UI
@@ -409,11 +525,6 @@ extension DzyImagePickerVC:
             cell?.delegate = self
             cell?.index = indexPath.row
         }
-        return cell!
-    }
-    
-    open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        let cell = cell as? ImagePickCell
         cell?.imgView?.image = nil
         if indexPath.item == 0 {
             cell?.camearStyle()
@@ -428,7 +539,14 @@ extension DzyImagePickerVC:
                 }
             })
         }
+        return cell!
     }
+    
+//    open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        let cell = cell as? ImagePickCell
+//        cell?.imgView?.image = nil
+//
+//    }
     
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.item == 0 { // 相机
@@ -450,11 +568,6 @@ extension DzyImagePickerVC:
             let vc = DzyImageBrowserVC(photo, type: editType)
             navigationController?.pushViewController(vc, animated: true)
         case .origin(let originType):
-            let option = PHImageRequestOptions()
-            option.resizeMode = .exact
-            option.deliveryMode = .highQualityFormat
-            option.isSynchronous = true
-            
             let handler: (UIImage?, [AnyHashable : Any]?) -> (Void) = { [unowned self] (image, _) in
                 if let image = image {
                     switch originType {
@@ -468,7 +581,7 @@ extension DzyImagePickerVC:
                 }
             }
             let manager = PHImageManager.default()
-            manager.requestImage(for: photo, targetSize: CGSize(width: photo.pixelWidth, height: photo.pixelHeight), contentMode: .aspectFit, options: option, resultHandler: handler)
+            manager.requestImage(for: photo, targetSize: CGSize(width: photo.pixelWidth, height: photo.pixelHeight), contentMode: .aspectFit, options: PickerConfig.synOption, resultHandler: handler)
         }
     }
     
@@ -519,6 +632,10 @@ extension DzyImagePickerVC:
         )
         footer.backgroundColor = .white
         return footer
+    }
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updateCachedAssets()
     }
 }
 

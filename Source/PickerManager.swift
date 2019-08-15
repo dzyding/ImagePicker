@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Photos
 
 public protocol DzyImagePickerVCDelegate: class {
     /// 裁剪过的
@@ -26,6 +27,29 @@ struct PickerConfig {
     )
     /// 多选时图片的最大宽/高
     static let maxSize: Int = 1500
+    /// 缩略图
+    static let smallSize: CGSize = {
+        let screenW = UIScreen.main.bounds.size.width
+        let scale = UIScreen.main.scale
+        let x = (screenW - 6.0) / 4.0
+        return CGSize(width: x * scale, height: x * scale)
+    }()
+    /// 异步
+    static let asynOption: PHImageRequestOptions = {
+        let option = PHImageRequestOptions()
+        option.resizeMode = .exact
+        option.deliveryMode = .highQualityFormat
+        option.isSynchronous = false
+        return option
+    }()
+    /// 同步
+    static let synOption: PHImageRequestOptions = {
+        let option = PHImageRequestOptions()
+        option.resizeMode = .exact
+        option.deliveryMode = .highQualityFormat
+        option.isSynchronous = true
+        return option
+    }()
 }
 
 public struct PickerNotice {
@@ -35,8 +59,6 @@ public struct PickerNotice {
 
 /// 统一保存，不然几个界面间跳转的时候，需要传来传去的
 struct PickerManager {
-    /// 缩略图
-    static var smallSize = CGSize(width: 500.0, height: 500.0)
     
     static var `default` = PickerManager()
     

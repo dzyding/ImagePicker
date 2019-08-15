@@ -90,11 +90,7 @@ public class DzyImageBrowserVC: UIViewController {
         if let photo = photo as? PHAsset {
             let manager = PHImageManager.default()
             let size = CGSize(width: photo.pixelWidth, height: photo.pixelHeight)
-            let option = PHImageRequestOptions()
-            option.resizeMode = .exact
-            option.deliveryMode = .highQualityFormat
-            option.isSynchronous = true
-            manager.requestImage(for: photo, targetSize: size, contentMode: .aspectFit, options: option) { (image, info) in
+            manager.requestImage(for: photo, targetSize: size, contentMode: .aspectFit, options: PickerConfig.synOption) { (image, info) in
                 self.updateViews(image)
             }
         }
