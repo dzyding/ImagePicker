@@ -25,6 +25,7 @@
 		007374FA2255B22B00C3D456 /* CancelBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007374F12255B22B00C3D456 /* CancelBtn.swift */; };
 		00B427AD22C058FF00C6C428 /* DzyImageShowVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B427AC22C058FF00C6C428 /* DzyImageShowVC.swift */; };
 		00B427AF22C0610000C6C428 /* CustomBackBtnProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B427AE22C0610000C6C428 /* CustomBackBtnProtocol.swift */; };
+		402E672624F4B4CC00774CE5 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 402E672524F4B4CC00774CE5 /* ProgressView.swift */; };
 		8E9EA93292D1A42CBE52CD17 /* Pods_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2937F5BB67B2F35D2D4BA72A /* Pods_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +52,7 @@
 		00B427AE22C0610000C6C428 /* CustomBackBtnProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackBtnProtocol.swift; sourceTree = "<group>"; };
 		11232D161F68188D67BE3DE2 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		2937F5BB67B2F35D2D4BA72A /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		402E672524F4B4CC00774CE5 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		F6C3FE6ADC9E41ECC951E35E /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -111,6 +113,7 @@
 				007374EE2255B22B00C3D456 /* AlbumsCell.swift */,
 				007374ED2255B22B00C3D456 /* ImagePickCell.swift */,
 				007374EF2255B22B00C3D456 /* FocusView.swift */,
+				402E672524F4B4CC00774CE5 /* ProgressView.swift */,
 				007374F12255B22B00C3D456 /* CancelBtn.swift */,
 				007374EC2255B22B00C3D456 /* TakePhotoBtn.swift */,
 				00B427AE22C0610000C6C428 /* CustomBackBtnProtocol.swift */,
@@ -263,6 +266,7 @@
 			files = (
 				00B427AD22C058FF00C6C428 /* DzyImageShowVC.swift in Sources */,
 				007374F62255B22B00C3D456 /* ImagePickCell.swift in Sources */,
+				402E672624F4B4CC00774CE5 /* ProgressView.swift in Sources */,
 				007374F52255B22B00C3D456 /* TakePhotoBtn.swift in Sources */,
 				00594AC922533B45006CA687 /* ViewController.swift in Sources */,
 				007374F32255B22B00C3D456 /* DzyImageBrowserVC.swift in Sources */,
@@ -422,14 +426,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 52A72CFPBQ;
+				DEVELOPMENT_TEAM = 772S5TN7PR;
 				INFOPLIST_FILE = Example/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dzy.Example;
+				PRODUCT_BUNDLE_IDENTIFIER = dzy.imagePicker.Example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -442,14 +446,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 52A72CFPBQ;
+				DEVELOPMENT_TEAM = 772S5TN7PR;
 				INFOPLIST_FILE = Example/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dzy.Example;
+				PRODUCT_BUNDLE_IDENTIFIER = dzy.imagePicker.Example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -246,10 +246,12 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
     }
     
     //    MARK: - 多选时的确认操作
-    @objc public func severalSureAction() {
+    @objc public func severalSureAction(_ btn: UIButton) {
         guard let photos = photos, photos.count > 0 else {return}
+        btn.isUserInteractionEnabled = false
         delegate?.selectedFinshAndBeginDownload(self)
         let group = DispatchGroup()
+        // 获取 Size
         let sizeHandler: (PHAsset) -> CGSize = { photo in
             let w = photo.pixelWidth
             let h = photo.pixelHeight
@@ -264,29 +266,63 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
             }
         }
         
+        // 循环异步请求
         let indexs = sIndexs.filter({$0 != -1})
         var imgs = [UIImage](repeating: UIImage(), count: indexs.count)
+        let IDKEY = "PHImageResultRequestIDKey"
+        // Int 为照片的 Key， Double 为进度
+        var progressDic: [Int : Double] = [:]
         
+        func updateProgress() {
+            let max = Double(indexs.count)
+            var current: Double = 0
+            progressDic.forEach({
+                current += $1
+            })
+            DispatchQueue.main.async {
+                let value = (current / max) * 100.0
+                let str = String(format: "%.0lf", value)
+                self.hudAndTextView.updateMsg("\(str)/100")
+            }
+        }
+        
+        let handler: PHAssetImageProgressHandler = { (value, error, point, info) in
+            if let rId = info?[IDKEY] as? Int {
+                progressDic[rId] = value
+                updateProgress()
+            }
+        }
+        
+        hudAndTextView.show(view)
+        hudAndTextView.updateMsg("0/100")
         for (index, value) in indexs.enumerated() {
             let i = value - 1
             if i < photos.count {
                 let photo = photos[i]
                 group.enter()
+                let options = PickerConfig.asynOption
+                options.isNetworkAccessAllowed = true
+                options.progressHandler = handler
                 let manager = PHImageManager.default()
                 manager.requestImage(
                     for: photo,
                     targetSize: sizeHandler(photo),
                     contentMode: .aspectFit,
-                    options: PickerConfig.asynOption
-                ) { (image, _) in
-                    if let image = image {
+                    options: options
+                ) { (image, info) in
+                    if let image = image,
+                        let rId = info?[IDKEY] as? Int
+                    {
                         imgs[index] = image
+                        progressDic[rId] = 1
+                        updateProgress()
                     }
                     group.leave()
                 }
             }
         }
         group.notify(queue: DispatchQueue.main) {
+            self.hudAndTextView.disMiss()
             self.delegate?.imagePicker(self, getImages: imgs)
             self.dismiss(animated: true, completion: nil)
         }
@@ -498,7 +534,7 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         btn.setTitle("选择(0)", for: .normal)
         btn.addTarget(
             self,
-            action: #selector(severalSureAction),
+            action: #selector(severalSureAction(_:)),
             for: .touchUpInside
         )
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 14)
@@ -507,6 +543,10 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         btn.layer.masksToBounds = true
         return btn
     }()
+    
+    private lazy var signlHudView = ProgressView(.hud)
+    
+    private lazy var hudAndTextView = ProgressView(.hudAndText)
 }
 
 extension DzyImagePickerVC:
@@ -542,12 +582,6 @@ extension DzyImagePickerVC:
         return cell!
     }
     
-//    open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        let cell = cell as? ImagePickCell
-//        cell?.imgView?.image = nil
-//
-//    }
-    
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.item == 0 { // 相机
             if type.isSeveral && selectedNum >= type.maxCount {
@@ -568,20 +602,26 @@ extension DzyImagePickerVC:
             let vc = DzyImageBrowserVC(photo, type: editType)
             navigationController?.pushViewController(vc, animated: true)
         case .origin(let originType):
-            let handler: (UIImage?, [AnyHashable : Any]?) -> (Void) = { [unowned self] (image, _) in
-                if let image = image {
-                    switch originType {
-                    case .single:
-                        self.dismiss(animated: true, completion: nil)
-                        PickerManager.default.delegate?.imagePicker(self, getOriginImage: image)
-                    case .several:
-                        let vc = DzyImageShowVC(image)
-                        self.navigationController?.pushViewController(vc, animated: true)
+            let handler: (UIImage?, [AnyHashable : Any]?) -> (Void) = { (image, _) in
+                DispatchQueue.main.async { [unowned self] in
+                    self.signlHudView.disMiss()
+                    if let image = image {
+                        switch originType {
+                        case .single:
+                            self.dismiss(animated: true, completion: nil)
+                            PickerManager.default.delegate?.imagePicker(self, getOriginImage: image)
+                        case .several:
+                            let vc = DzyImageShowVC(image)
+                            self.navigationController?.pushViewController(vc, animated: true)
+                        }
                     }
                 }
             }
+            signlHudView.show(self.view)
+            let options = PickerConfig.asynOption
+            options.isNetworkAccessAllowed = true
             let manager = PHImageManager.default()
-            manager.requestImage(for: photo, targetSize: CGSize(width: photo.pixelWidth, height: photo.pixelHeight), contentMode: .aspectFit, options: PickerConfig.synOption, resultHandler: handler)
+            manager.requestImage(for: photo, targetSize: CGSize(width: photo.pixelWidth, height: photo.pixelHeight), contentMode: .aspectFit, options: options, resultHandler: handler)
         }
     }
     
