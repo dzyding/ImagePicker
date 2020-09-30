@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
  s.name         = 'DzyImagePicker'
 
- s.version      = '1.1.5'
+ s.version      = '1.1.7'
 
  s.summary      = 'image picker'
 
