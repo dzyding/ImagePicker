@@ -211,6 +211,8 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         case .authorized:
             // 用户已授权
             getPhotoAlbums()
+        case .limited:
+            break
         @unknown default:
             break
         }
