@@ -146,22 +146,27 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
     
     
     private func saveImage(_ image: UIImage) {
-        guard let imageData = image.pngData() else {return}
-        var identifier: String = ""
-        PHPhotoLibrary.shared().performChanges({
-            let request = PHAssetCreationRequest.forAsset()
-            request.addResource(with: .photo, data: imageData, options: nil)
-            if let idf = request.placeholderForCreatedAsset?.localIdentifier {
-                identifier = idf
-            }
-        }) { (result, error) in
-            if result {
-                self.saveSuccessAction(image, identifier: identifier)
-            }
-        }
+        UIImageWriteToSavedPhotosAlbum(
+            image,
+            self,
+            #selector(self.image(_:didFinishSavingWithError:contextInfo:)),
+            nil)
+//        guard let imageData = image.pngData() else {return}
+//        var identifier: String = ""
+//        PHPhotoLibrary.shared().performChanges({
+//            let request = PHAssetCreationRequest.forAsset()
+//            request.addResource(with: .photo, data: imageData, options: nil)
+//            if let idf = request.placeholderForCreatedAsset?.localIdentifier {
+//                identifier = idf
+//            }
+//        }) { (result, error) in
+//            if result {
+//
+//            }
+//        }
     }
     
-    private func saveSuccessAction(_ image: UIImage, identifier: String) {
+    private func saveSuccessAction(_ image: UIImage) {
         (0..<sIndexs.count).forEach { (index) in
             if sIndexs[index] != -1 {
                 sIndexs[index] += 1
@@ -169,7 +174,7 @@ public class DzyImagePickerVC: UIViewController, CustomBackBtnProtocol {
         }
         sIndexs[selectedNum] = 1
         selectedNum += 1
-        caches.setObject(image, forKey: NSString(string: identifier))
+//        caches.setObject(image, forKey: NSString(string: identifier)
         select.insert(selectedNum, at: 0)
         getPhotoAlbums(true, initCaches: false)
     }
@@ -573,11 +578,13 @@ extension DzyImagePickerVC:
             let photo = photos?.object(at: row)
             let idf = NSString(string: photo?.localIdentifier ?? "")
             let cache = caches.object(forKey: NSString(string: idf))
-            cell?.updateViews(photo, cache: cache, selectNum: select[row], complete: { [weak self] (image) in
-                if let image = image {
-                    self?.caches.setObject(image, forKey: idf)
-                }
-            })
+            if row < select.count {
+                cell?.updateViews(photo, cache: cache, selectNum: select[row], complete: { [weak self] (image) in
+                    if let image = image {
+                        self?.caches.setObject(image, forKey: idf)
+                    }
+                })
+            }
         }
         return cell!
     }
@@ -721,6 +728,14 @@ extension DzyImagePickerVC: ImagePickCellDelegate {
                 }
                 collectionView?.reloadData()
             }
+        }
+    }
+}
+
+extension DzyImagePickerVC {
+    @objc open func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if error == nil {
+            self.saveSuccessAction(image)
         }
     }
 }

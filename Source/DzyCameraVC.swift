@@ -360,7 +360,7 @@ extension DzyCameraVC: AVCapturePhotoCaptureDelegate {
         }
     }
     
-    @objc open func image(_ image: UIImage, didFinishSavingWithError error: Error, contextInfo: UnsafeRawPointer) {
+    @objc open func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
         print("成功")
     }
 }
